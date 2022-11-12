@@ -33,19 +33,19 @@ public:
     }
 
     ///
-    /// parametrized constructor. Takes block size in number of bytes
+    /// parametrized constructor. Initialize vector with count elements
     ///
-    vector(size_type block_size)
-        :   m_array{ nullptr }, m_count{ block_size }, m_capacity{ block_size }
+    vector(size_type count)
+        :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
     {
-        if (block_size != 0)
+        if (count != 0)
         {
             this->m_array = new (std::nothrow) T[this->m_count]{};
         }
     }
 
     ///
-    /// parametrized constructor. Initializes the vector from
+    /// parametrized constructor. Initializes the vector
     /// with the elements from the list
     ///
     vector(std::initializer_list<T>&& content)
@@ -56,8 +56,7 @@ public:
     }
 
     ///
-    /// copy constructor. Realocates new block and initializes it
-    /// with a copy of the elements from p_vector
+    /// copy constructor. Deep copy of p_vector
     ///
     vector(const vector& p_vector)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
@@ -75,7 +74,7 @@ public:
     }
 
     ///
-    /// assigment operator by deep copy
+    /// assigment operator. Deep copy of p_vector
     ///
     vector& operator=(const vector& p_vector)
     {
@@ -167,7 +166,7 @@ public:
     }
 
     ///
-    /// return constant sreference to element at postion "index"
+    /// return constant reference to element at postion "index"
     ///
     auto operator[](size_type index) const -> const T&
     {
@@ -175,7 +174,7 @@ public:
     }
 
     ///
-    /// return constant sreference to element at postion "index"
+    /// return constant reference to element at postion "index"
     /// throws exceptions if index is not valid or vector is empty
     ///
     auto at(size_type index) -> T&
@@ -198,10 +197,12 @@ public:
     ///
     /// reserve a block of memory
     ///
-    auto reserve(size_type block_size) -> void
+    auto reserve(size_type count) -> void
     {
-        // keep in mind this function can be called at any point and state of
-        // the vector in the program
+        // TODO
+        
+        // this function can be called at any point and 
+        // state of the vector in the program
 
     }
 
