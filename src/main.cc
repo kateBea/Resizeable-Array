@@ -17,9 +17,10 @@ public:
     }
 };
 
+
 int main(int, char**)
 {
-    kate::vector<float> l_floats(5);
+    kt::vector<float> l_floats(5);
 
     for (std::size_t index{}; index < l_floats.size(); ++index)
         l_floats[index] = 0.2f + static_cast<float>(index);
@@ -32,7 +33,7 @@ int main(int, char**)
     std::cout << std::endl;
 
     // kate::vector<float> l_steal(static_cast<kate::vector<float>&&>(l_floats));
-    kate::vector<float> l_steal(std::move(l_floats));
+    kt::vector<float> l_steal(std::move(l_floats));
 
     std::cout << "After l_steal. l_float has: " << l_floats.size() <<
         " elements\n";
@@ -46,14 +47,14 @@ int main(int, char**)
     l_floats.at(2);
     std::cout << std::endl;
 
-    kate::vector<double>  doubles{ 1.3, 2.33, 5.11, -34.22, 5.22, 7.11 };
+    kt::vector<double>  doubles{ 1.3, 2.33, 5.11, -34.22, 5.22, 7.11 };
 
     for (std::size_t index{}; index < doubles.size(); ++index)
         std::cout << doubles[index] << ' ';
 
     std::cout << std::endl;
 
-    kate::vector<std::size_t> numbers{ 22, 44, 44, 111, 451, 0xFFAB, 34, 0b11 };
+    kt::vector<std::size_t> numbers{ 22, 44, 44, 111, 451, 0xFFAB, 34, 0b11 };
     for (std::size_t index{}; index < doubles.size(); ++index)
         std::cout << numbers[index] << ' ';
 
@@ -79,7 +80,7 @@ int main(int, char**)
     std::cout << "-----------------------------------------\n";
 
     std::cout << "***** DOING INSERTIONS *****\n";
-    kate::vector<double> real_numbers{};
+    kt::vector<double> real_numbers{};
 
     real_numbers.push_back(4.33);
     real_numbers.push_back(-1.63);
@@ -97,7 +98,7 @@ int main(int, char**)
     std::cout << "-----------------------------------------\n";
 
     std::cout << "***** TESTING POP_BACK *****\n";
-    kate::vector<Resource> res{};
+    kt::vector<Resource> res{};
 
     res.push_back(Resource(44));
     res.push_back(Resource(11));
