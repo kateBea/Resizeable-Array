@@ -1,2 +1,2 @@
-# Home-made-vector
-Simple vector class
+# Some vector
+std::vector but bad
