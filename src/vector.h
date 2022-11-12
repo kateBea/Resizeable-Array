@@ -265,7 +265,7 @@ private:
 
         if (not new_block)
         {
-            std::cerr << "Failed to allocate new lock of memory\n";
+            std::cerr << "Failed to allocate new block of memory\n";
             return;
         }
 
