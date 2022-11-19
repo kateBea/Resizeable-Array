@@ -125,6 +125,17 @@ int main(int, char**)
 
     std::cout << "real_numbers vector current amount for elements: " << res.size() << std::endl;
     std::cout << "real_numbers vector current capacity: " << res.capacity() << std::endl;
+    
+    std::cout << "****** RANGED FOR KATE::VECTOR ******" << std::endl;
+    kt::vector<double> reales{ 3.44, 5.22, -5.66, 8.11, 9.23, 10.34 };
+
+    std::cout << "CONST RANGED-FOR:     ";
+    for (const auto& it : reales)
+        std::cout << it << ' ';
+
+    std::cout << std::endl << "NON-CONST RANGED-FOR: ";
+    for (auto& it : reales)
+        std::cout << it << ' ';
 
     std::cout << std::endl;
     return 0;
