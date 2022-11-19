@@ -17,7 +17,7 @@
 
 namespace kt
 {
-template <typename T, typename Allocator = std::allocator<T>>
+template <typename T>
 class vector
 {
 public:
