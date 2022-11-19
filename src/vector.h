@@ -11,17 +11,20 @@
 #include <string_view>
 #include <algorithm>
 
+#include <memory>
+
 #define DEBUG_LOG(log_str)  std::cerr << log_str << '\n'
 
 namespace kt
 {
-template <typename T>
+template <typename T, typename Allocator = std::allocator<T>>
 class vector
 {
 public:
     using size_type = std::size_t;
     using index_type = std::size_t;
     using pointer_type = T*;
+    using const_pointer_type = const T*;
 
     ///
     /// default constructor
@@ -40,7 +43,7 @@ public:
     {
         if (count != 0)
         {
-            this->m_array = new (std::nothrow) T[this->m_count]{};
+            this->m_array = new (std::nothrow) T[this->m_count];
         }
     }
 
@@ -200,8 +203,8 @@ public:
     auto reserve(size_type count) -> void
     {
         // TODO
-        
-        // this function can be called at any point and 
+
+        // this function can be called at any point and
         // state of the vector in the program
 
     }
@@ -234,34 +237,87 @@ public:
         }
     }
 
+    ///
+    /// Insert one element at the end of the vector
+    /// with support on move semantics
+    ///
+    auto push_back(T&& info) -> void
+    {
+        // if capacity == count:
+        // allocate new block
+        // copy data from old block to new block
+        // add new data
+        // delete old block
+
+        // otherwise (capacity > count)
+        // put new element at the end
+        // increase count by 1
+        if (this->m_capacity > this->m_count)
+        {
+            m_array[m_count] = std::move(info);
+            this->m_count += 1;
+        }
+        else
+        {
+            reallocate();
+
+            this->m_array[m_count] = std::move(info);
+            this->m_count += 1;
+        }
+    }
+
     auto pop_back() -> void
     {
-        this->m_count -= (this->m_count == 0) ? 0 : 1;
-        this->m_array[m_count - 1].~T();
+        if (m_count != 0)
+        {
+            m_array[m_count - 1].~T();
+            m_count -= 1;
+
+        }
+
     }
 
     auto clear() -> void
     {
-        delete[] this->m_array;
+        std::for_each(m_array, m_array + m_count, [](T& info) -> void { info.~T(); });
 
-        this->m_capacity = 0;
+        // std::destroy_n(this->m_array, this->m_count);
+
+        // for (size_type index{}; index < m_count; ++index)
+        //     this->m_array[index].~T();
+
         this->m_count = 0;
-        this->m_array = nullptr;
     }
 
     auto resize(size_type block_size) -> void;
 
-    //auto begin() -> some_terator;
-    //auto end() -> some_iterator;
+    auto begin() -> pointer_type
+    {
+        return &(this->m_array[0]);
+    }
 
-    //auto cbegin() -> some_terator;
-    //auto cend() -> some_iterator;
+    auto end() -> pointer_type
+    {
+        return &(this->m_array[this->m_count]);
+    }
+
+    auto cbegin() const -> const_pointer_type
+    {
+        return &(this->m_array[0]);
+    }
+
+    auto cend() const -> const_pointer_type
+    {
+        return &(this->m_array[this->m_count]);
+    }
 
 private:
+    static constexpr size_type grow_factor{ 2 };
+
     void reallocate()
     {
-        size_type new_block_size{ (!this->m_capacity) ? 1 : (m_capacity * 2) };
-        pointer_type new_block{ new (std::nothrow) T[new_block_size]{} };
+        size_type new_block_size{ (!this->m_capacity) ? 1 : (m_capacity * grow_factor) };
+        pointer_type new_block{ new (std::nothrow) T[new_block_size] };
 
         if (not new_block)
         {
@@ -317,4 +373,5 @@ private:
 };
 
 }   // END KATE NAMESPACE
+
 #endif // END VECTOR
