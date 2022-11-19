@@ -265,7 +265,10 @@ public:
             this->m_count += 1;
         }
     }
-
+    
+    ///
+    /// Remove the last element from the vector
+    ///
     auto pop_back() -> void
     {
         if (m_count != 0)
@@ -276,7 +279,10 @@ public:
         }
 
     }
-
+    
+    ///
+    /// Remove all elements of the vector
+    ///
     auto clear() -> void
     {
         std::for_each(m_array, m_array + m_count, [](T& info) -> void { info.~T(); });
@@ -288,25 +294,40 @@ public:
 
         this->m_count = 0;
     }
-
+    
+    ///
+    /// Ajust vector to contain count elements
+    ///
     auto resize(size_type block_size) -> void;
 
+    ///
+    /// Returns a pointer to the beginning of the vector
+    ///
     auto begin() -> pointer_type
     {
         return &(this->m_array[0]);
     }
 
+    ///
+    /// Returns a pointer to the end of the vector
+    ///
     auto end() -> pointer_type
     {
         return &(this->m_array[this->m_count]);
     }
 
-    auto cbegin() const -> const_pointer_type
+    ///
+    /// Returns a pointer to the beginning of the vector
+    ///
+    auto cbegin() const -> pointer_to_const_type
     {
         return &(this->m_array[0]);
     }
 
-    auto cend() const -> const_pointer_type
+    ///
+    /// Returns a pointer to the end of the vector
+    ///
+    auto cend() const -> pointer_to_const_type
     {
         return &(this->m_array[this->m_count]);
     }
