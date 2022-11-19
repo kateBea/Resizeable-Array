@@ -22,7 +22,6 @@ class vector
 {
 public:
     using size_type = std::size_t;
-    using index_type = std::size_t;
     using pointer_type = T*;
     using const_pointer_type = const T*;
 
