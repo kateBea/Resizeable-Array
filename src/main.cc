@@ -1,4 +1,5 @@
 #include "vector.h"
+#include <iostream>
 
 class Resource
 {
@@ -17,7 +18,6 @@ public:
     }
 };
 
-
 int main(int, char**)
 {
     kt::vector<float> l_floats(5);
@@ -32,11 +32,9 @@ int main(int, char**)
 
     std::cout << std::endl;
 
-    // kate::vector<float> l_steal(static_cast<kate::vector<float>&&>(l_floats));
     kt::vector<float> l_steal(std::move(l_floats));
 
-    std::cout << "After l_steal. l_float has: " << l_floats.size() <<
-        " elements\n";
+    std::cout << "After l_steal. l_float has: " << l_floats.size() << " elements\n";
 
     for (std::size_t index{}; index < l_steal.size(); ++index)
         std::cout << l_steal[index] << ' ';
@@ -114,18 +112,29 @@ int main(int, char**)
     res.pop_back();
     res.pop_back();
 
-    std::cout << "real_numbers vector current amount for elements: " << res.size() << std::endl;
-    std::cout << "real_numbers vector current capacity: " << res.capacity() << std::endl;
+    std::cout << "res vector current amount for elements: " << res.size() << std::endl;
+    std::cout << "res vector current capacity: " << res.capacity() << std::endl;
 
-    std::cout << "***** TESTING INSERTION AGAIN *****\n";
+    std::cout << "***** TESTING INSERTION AGAIN WITH MOVE SEMANTICS*****\n";
+
     res.push_back(Resource(44));
     res.push_back(Resource(11));
     res.push_back(Resource(66));
     res.push_back(Resource(77));
 
-    std::cout << "real_numbers vector current amount for elements: " << res.size() << std::endl;
-    std::cout << "real_numbers vector current capacity: " << res.capacity() << std::endl;
-    
+    res.push_back(std::move(Resource(44)));
+    res.push_back(std::move(Resource(11)));
+    res.push_back(std::move(Resource(66)));
+    res.push_back(std::move(Resource(77)));
+
+    std::cout << "res vector current amount for elements: " << res.size() << std::endl;
+    std::cout << "res vector current capacity: " << res.capacity() << std::endl;
+
+    std::cout << "***** CALL TO KATE::VECTOR::CLEAR *****\n";
+    res.clear();
+    std::cout << "res vector current amount for elements: " << res.size() << std::endl;
+    std::cout << "res vector current capacity: " << res.capacity() << std::endl;
+
     std::cout << "****** RANGED FOR KATE::VECTOR ******" << std::endl;
     kt::vector<double> reales{ 3.44, 5.22, -5.66, 8.11, 9.23, 10.34 };
 
