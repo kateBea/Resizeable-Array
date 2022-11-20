@@ -1,5 +1,6 @@
 # program name here
-PROGRAM_NAME_CXX = main.cc
+OUTPUT_BINARY = main
+SOURCE_FILES = main.cc
 INCLUDE_FILES = vector.h
 CXX_STANDARD = -std=c++17
 
@@ -7,10 +8,10 @@ CXX_STANDARD = -std=c++17
 all: program
 
 program: $(PROGRAM_NAME_CXX) $(INCLUDE_FILES)
-	g++ -o main $(CXX_STANDARD) -g -Wall -Wextra $(PROGRAM_NAME_CXX) $(LINK_POSIX_THREAD)
+	g++ -o $(OUTPUT_BINARY) $(CXX_STANDARD) -g -Wall -Wextra $(SOURCE_FILES)
 
 build_cxx_optimized: $(PROGRAM_NAME_CXX) $(INCLUDE_FILES)
-	g++ -o main $(CXX_STANDARD) -O2 -Wall -Wextra $(PROGRAM_NAME_CXX) $(LINK_POSIX_THREAD)
+	g++ -o $(OUTPUT_BINARY) $(CXX_STANDARD) -O2 -Wall -Wextra $(SOURCE_FILES)
 
 clean:
 	rm main
