@@ -22,8 +22,9 @@ template
 class vector
 {
 public:
-    using size_type = std::size_t;
-    using pointer_type = T*;
+    using size_type             = std::size_t;
+    using pointer_type          = T*;
+    using const_reference       = const T&;
     using pointer_to_const_type = const T*;
 
     ///
@@ -180,7 +181,7 @@ public:
     ///
     /// return constant reference to element at postion "index"
     ///
-    auto operator[](size_type index) const -> const T&
+    auto operator[](size_type index) const -> const_reference
     {
         return this->m_array[index];
     }
@@ -190,6 +191,27 @@ public:
     /// throws exceptions if index is not valid or vector is empty
     ///
     auto at(size_type index) -> T&
+    {
+        try
+        {
+            if (this->m_count == 0)
+                throw empty_vector{};
+            if (not (index > 0 and index < this->m_count))
+                throw out_of_bounds{};
+
+        }
+        catch (const out_of_bounds& oob) { std::printf("%s", oob.what()); }
+        catch (const empty_vector& ema) { std::printf("%s", ema.what()); }
+        catch(...) { std::printf("Other exceptions thrown"); }
+
+        return this->m_array[index];
+    }
+
+    ///
+    /// return constant reference to element at postion "index"
+    /// throws exceptions if index is not valid or vector is empty
+    ///
+    auto at(size_type index) const -> const_reference
     {
         try
         {
