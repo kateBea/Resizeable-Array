@@ -18,12 +18,13 @@
 namespace kt
 {
 template
-<typename T, typename alloc = std::allocator<T>>
+<typename T>
 class vector
 {
 public:
     using size_type             = std::size_t;
     using pointer_type          = T*;
+    using const_pointer_type    = T* const;
     using const_reference       = const T&;
     using pointer_to_const_type = const T*;
 
@@ -59,6 +60,51 @@ public:
     }
 
     ///
+    /// copy constructor. Initialize this vector with elements
+    /// within the ranged given by "first" and "last"
+    ///
+    vector(const_pointer_type first, const_pointer_type last)
+        :   m_array{ nullptr }, m_count{}, m_capacity{}
+    {
+        // TODO: fix erros, doesnt compile atm
+        // Amount of elements in the range between first and last
+        size_type new_block_size{ (reinterpret_cast<size_type>(last) - reinterpret_cast<size_type>(first)) / sizeof(T) };
+        if (new_block_size != 0)
+        {
+            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow));
+
+            if (this->m_array != nullptr)
+            {
+                std::copy(first, last, this->m_array);
+                this->m_count = new_block_size;
+                this->m_capacity = new_block_size;
+
+            }
+        }
+    }
+
+    ///
+    /// copy constructor. Initialize this vector "count"
+    /// elements starting from begin
+    ///
+    vector(const_pointer_type first, size_type count)
+        :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
+    {
+        // TODO: still needs testing
+        if (count != 0)
+        {
+            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * count, std::nothrow));
+
+            if (this->m_array != nullptr)
+            {
+                std::copy(first, first + count, this->m_array);
+                this->m_count = count;
+                this->m_capacity = count;
+            }
+        }
+    }
+
+    ///
     /// copy constructor. Initialize this vector with elements of "other"
     ///
     vector(const vector& other)
@@ -78,7 +124,7 @@ public:
     }
 
     ///
-    /// assigment operator. Deep copy of p_vector
+    /// assigment operator. Deep copy of other
     ///
     vector& operator=(const vector& other)
     {
@@ -241,6 +287,16 @@ public:
     }
 
     ///
+    /// Ajust vector to contain count elements
+    ///
+    auto resize(size_type count) -> void;
+
+    ///
+    /// Insert elements at the end
+    ///
+    void emplace_back();
+
+    ///
     /// Insert one element at the end of the vector
     ///
     auto push_back(const T& info) -> void
@@ -327,14 +383,9 @@ public:
     }
 
     ///
-    /// Ajust vector to contain count elements
-    ///
-    auto resize(size_type count) -> void;
-
-    ///
     /// Returns a pointer to the beginning of the vector
     ///
-    auto begin() -> pointer_type
+    auto begin() const -> pointer_type
     {
         return &(this->m_array[0]);
     }
@@ -342,7 +393,7 @@ public:
     ///
     /// Returns a pointer to the end of the vector
     ///
-    auto end() -> pointer_type
+    auto end() const -> pointer_type
     {
         return &(this->m_array[this->m_count]);
     }
