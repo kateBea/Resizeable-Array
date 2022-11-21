@@ -318,7 +318,10 @@ public:
         else
         {
             reallocate();
-
+            // TODO: What if reallocate fails to do its job
+            // need to treat this case here. As it is right now
+            // reallocate() is assumed to not fail thus we can append a new element
+            
             this->m_array[this->m_count] = info;
             this->m_count += 1;
         }
@@ -347,6 +350,10 @@ public:
         else
         {
             reallocate();
+            // TODO: What if reallocate fails to do its job
+            // need to treat this case here. As it is right now
+            // reallocate() is assumed to not fail thus we can append a new element
+
 
             this->m_array[this->m_count] = std::move(info);
             this->m_count += 1;
