@@ -10,6 +10,7 @@
 #include <initializer_list>
 #include <string_view>
 #include <algorithm>
+#include <iterator>
 
 #include <memory>
 
@@ -29,7 +30,7 @@ public:
     using pointer_to_const_type = const T*;
 
     ///
-    /// default constructor
+    /// Default constructor
     ///
     vector()
         :   m_array{ nullptr }, m_count{}, m_capacity{}
@@ -38,7 +39,7 @@ public:
     }
 
     ///
-    /// parametrized constructor. Reserve space to hold at least "count" elements
+    /// Parametrized constructor. Reserve space to hold at least "count" elements
     ///
     vector(size_type count)
         :   m_array{ nullptr }, m_count{ 0 }, m_capacity{ count }
@@ -48,7 +49,7 @@ public:
     }
 
     ///
-    /// parametrized constructor. Initializes vector
+    /// Parametrized constructor. Initializes vector
     /// with the elements from the "content"
     ///
     vector(std::initializer_list<T>&& content)
@@ -66,9 +67,19 @@ public:
     vector(const_pointer_type first, const_pointer_type last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        // TODO: fix erros, doesnt compile atm
-        // Amount of elements in the range between first and last
         size_type new_block_size{ (reinterpret_cast<size_type>(last) - reinterpret_cast<size_type>(first)) / sizeof(T) };
+
+        // alternative: the problem with this is that std::distance returns a difference type which
+        // seems to be typedef of long int thus leading to narrowing conversion essentially halving the
+        // maximum size of memory we can allocate (not taking into account tha
+        // fact that long int is converted to long unsigned int). Bellow example error from g++ 11 while testing
+
+        // warning: narrowing conversion of ‘std::distance<double*>(((const_pointer_type)first), ((const_pointer_type)last))’ from ‘std::iterator_traits<double*>::difference_type’ {aka ‘long int’} to ‘kt::vector<double>::size_type’ {aka ‘long unsigned int’} [-Wnarrowing]
+        // 70 |         size_type new_block_size{ std::distance(first, last) };
+
+        // size_type new_block_size{ static_cast<size_type>(std::distance(first, last)) };
+
+        // copy elements if the range between "first" and "last" is not empty
         if (new_block_size != 0)
         {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow));
@@ -170,7 +181,6 @@ public:
             this->m_array[index].~T();
 
         ::operator delete(this->m_array);
-        // delete[] this->m_array;
     }
 
     ///
@@ -255,7 +265,8 @@ public:
 
     ///
     /// return constant reference to element at postion "index"
-    /// throws exceptions if index is not valid or vector is empty
+    /// throws "out_of_bounds" exception if index is not within the range valid elements
+    /// or "empty_vector" if the vector has no elements
     ///
     auto at(size_type index) const -> const_reference
     {
@@ -267,15 +278,24 @@ public:
                 throw out_of_bounds{};
 
         }
-        catch (const out_of_bounds& oob) { std::printf("%s", oob.what()); }
-        catch (const empty_vector& ema) { std::printf("%s", ema.what()); }
-        catch(...) { std::printf("Other exceptions thrown"); }
+        catch (const out_of_bounds& oob)
+        {
+            std::printf("%s", oob.what());
+        }
+        catch (const empty_vector& ema)
+        {
+             std::printf("%s", ema.what());
+        }
+        catch(...)
+        {
+            std::printf("Other exceptions thrown");
+        }
 
         return this->m_array[index];
     }
 
     ///
-    /// reserve a block of memory
+    /// reserve a block of memory to hold count elements
     ///
     auto reserve(size_type count) -> void
     {
@@ -318,10 +338,15 @@ public:
         else
         {
             reallocate();
-            // TODO: What if reallocate fails to do its job
-            // need to treat this case here. As it is right now
-            // reallocate() is assumed to not fail thus we can append a new element
-            
+
+            // if reallocate fails, m_size will remain same as m_capacity
+            // preventing from appending new element
+            if (this->m_capacity == this->m_count)
+            {
+                std::printf("could not insert new element due to error while reallocating...");
+                return;
+            }
+
             this->m_array[this->m_count] = info;
             this->m_count += 1;
         }
@@ -350,9 +375,14 @@ public:
         else
         {
             reallocate();
-            // TODO: What if reallocate fails to do its job
-            // need to treat this case here. As it is right now
-            // reallocate() is assumed to not fail thus we can append a new element
+
+            // if reallocate fails, m_size will remain same as m_capacity
+            // preventing from appending new element
+            if (this->m_capacity == this->m_count)
+            {
+                std::printf("could not insert new element due to error while reallocating...");
+                return;
+            }
 
             this->m_array[this->m_count] = std::move(info);
             this->m_count += 1;
@@ -368,7 +398,6 @@ public:
         {
             m_array[m_count - 1].~T();
             m_count -= 1;
-
         }
 
     }
@@ -379,12 +408,6 @@ public:
     auto clear() -> void
     {
         std::for_each(this->m_array, this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
-
-        // std::destroy_n(this->m_array, this->m_count);
-
-        // for (size_type index{}; index < m_count; ++index)
-        //     this->m_array[index].~T();
-
         this->m_count = 0;
     }
 
@@ -393,6 +416,8 @@ public:
     ///
     auto begin() const -> pointer_type
     {
+        // "this" should not be const here?
+        // used temporarily to solve ranged for issue with const kt::vector
         return &(this->m_array[0]);
     }
 
@@ -401,6 +426,8 @@ public:
     ///
     auto end() const -> pointer_type
     {
+        // "this" should not be const here?
+        // used temorarily to solve ranged for issue with const kt::vector
         return &(this->m_array[this->m_count]);
     }
 
