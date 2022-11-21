@@ -354,7 +354,6 @@ public:
             // need to treat this case here. As it is right now
             // reallocate() is assumed to not fail thus we can append a new element
 
-
             this->m_array[this->m_count] = std::move(info);
             this->m_count += 1;
         }
