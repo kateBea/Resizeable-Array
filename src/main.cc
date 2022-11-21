@@ -20,29 +20,29 @@ public:
 
 int main(int, char**)
 {
-    kt::vector<float> l_floats(5);
+    kt::vector<float> vector1(5);
 
-    for (std::size_t index{}; index < l_floats.size(); ++index)
-        l_floats[index] = 0.2f + static_cast<float>(index);
+    for (std::size_t index{}; index < vector1.size(); ++index)
+        vector1[index] = 0.2f + static_cast<float>(index);
 
-    std::cout << "Before l_steal. l_float has: " << l_floats.size() <<
-        " elements\n";
-    for (std::size_t index{}; index < l_floats.size(); ++index)
-        std::cout << l_floats[index] << ' ';
+    std::cout << "Before vector2's construction vector1 has: " << vector1.size() << " elements\n";
 
-    std::cout << std::endl;
-
-    kt::vector<float> l_steal(std::move(l_floats));
-
-    std::cout << "After l_steal. l_float has: " << l_floats.size() << " elements\n";
-
-    for (std::size_t index{}; index < l_steal.size(); ++index)
-        std::cout << l_steal[index] << ' ';
+    for (std::size_t index{}; index < vector1.size(); ++index)
+        std::cout << vector1[index] << ' ';
 
     std::cout << std::endl;
 
-    std::cout << "l_floats.at(2): ";
-    l_floats.at(2);
+    kt::vector<float> vector2(std::move(vector1));
+
+    std::cout << "After vector2's construction vector1 has: " << vector1.size() << " elements\n";
+
+    for (std::size_t index{}; index < vector2.size(); ++index)
+        std::cout << vector2[index] << ' ';
+
+    std::cout << std::endl;
+
+    std::cout << "vector1.at(2): ";
+    vector1.at(2);
     std::cout << std::endl;
 
     kt::vector<double>  doubles{ 1.3, 2.33, 5.11, -34.22, 5.22, 7.11 };
@@ -115,7 +115,7 @@ int main(int, char**)
     std::cout << "res vector current amount for elements: " << res.size() << std::endl;
     std::cout << "res vector current capacity: " << res.capacity() << std::endl;
 
-    std::cout << "***** TESTING INSERTION AGAIN WITH MOVE SEMANTICS*****\n";
+    std::cout << "***** TESTING INSERTION AGAIN WITH MOVE SEMANTICS *****\n";
 
     res.push_back(Resource(44));
     res.push_back(Resource(11));
@@ -145,6 +145,21 @@ int main(int, char**)
     std::cout << std::endl << "NON-CONST RANGED-FOR: ";
     for (auto& it : reales)
         std::cout << it << ' ';
+
+    std::cout << std::endl;
+
+    std::cout << "****** TESTING CONSTRUCTOR WITH ITERATORS ******" << std::endl;
+    kt::vector<double> vector3{ 3.44, 5.22, -5.66, 8.11, 9.23, 10.34 };
+    const kt::vector<double> vector3copy(vector3.begin(), vector3.end());
+
+    for (auto& it : vector3)
+        std::cout << it << ' ';
+
+    std::cout << std::endl;
+    
+    for (const auto& it : vector3copy)
+        std::cout << it << ' ';
+
 
     std::cout << std::endl;
     return 0;
