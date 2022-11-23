@@ -1,6 +1,7 @@
 #ifndef VECTOR_HH
 #define VECTOR_HH
 
+// C++ standard library includes
 #include <cstdio>
 #include <new>
 #include <cstring>
@@ -11,7 +12,6 @@
 #include <string_view>
 #include <algorithm>
 #include <iterator>
-
 #include <memory>
 
 #define DEBUG_LOG(log_str)  std::cerr << log_str << '\n'
@@ -175,11 +175,15 @@ public:
             ::operator delete(this->m_array);
 
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * other.m_count, std::nothrow));
-            this->m_count = other.m_count;
-            this->m_capacity = other.m_capacity;
 
             if (this->m_array)
+            {
                 std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
+                this->m_count = other.m_count;
+                this->m_capacity = other.m_capacity;
+            }
+            else
+                std::printf("could not allocate block of memory...");
         }
 
         return *this;
