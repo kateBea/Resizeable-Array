@@ -46,11 +46,17 @@ public:
     {
         if (count != 0)
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * count, std::nothrow));
+
+        if (not this->m_array)
+        {
+            std::printf("could not allocate block of memory...");
+            this->m_capacity = 0;
+        }
     }
 
     ///
     /// Parametrized constructor. Initializes vector
-    /// with the elements from the "content"
+    /// with the elements from "content"
     ///
     vector(std::initializer_list<T>&& content)
         :   m_array{ static_cast<pointer_type>(::operator new(sizeof(T) * content.size(), std::nothrow)) },
@@ -58,10 +64,16 @@ public:
     {
         if (this->m_array)
             std::copy(content.begin(), content.end(), this->m_array);
+        else
+        {
+            std::printf("could not allocate block of memory...");
+            this->m_count = 0;
+            this->m_capacity = 0;
+        }
     }
 
     ///
-    /// copy constructor. Initialize this vector with elements
+    /// Parametrized constructor. Initialize this vector with elements
     /// within the ranged given by "first" and "last"
     ///
     vector(const_pointer_type first, const_pointer_type last)
@@ -84,19 +96,23 @@ public:
         {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow));
 
-            if (this->m_array != nullptr)
+            if (this->m_array)
             {
                 std::copy(first, last, this->m_array);
                 this->m_count = new_block_size;
                 this->m_capacity = new_block_size;
 
             }
+            else
+            {
+                std::printf("could not allocate block of memory...");
+            }
         }
     }
 
     ///
-    /// copy constructor. Initialize this vector "count"
-    /// elements starting from begin
+    /// Parametrized constructor. Initialize this vector with "count"
+    /// elements starting from "begin"
     ///
     vector(const_pointer_type first, size_type count)
         :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
@@ -106,17 +122,23 @@ public:
         {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * count, std::nothrow));
 
-            if (this->m_array != nullptr)
+            if (this->m_array)
             {
                 std::copy(first, first + count, this->m_array);
                 this->m_count = count;
                 this->m_capacity = count;
             }
+            else
+            {
+                std::printf("could not allocate block of memory...");
+                this->m_count = 0;
+                this->m_capacity = 0;
+            }
         }
     }
 
     ///
-    /// copy constructor. Initialize this vector with elements of "other"
+    /// Copy constructor. Initialize this vector with elements from "other"
     ///
     vector(const vector& other)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
@@ -125,17 +147,23 @@ public:
         {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * other.m_count, std::nothrow));
 
-
-            this->m_count = other.m_count;
-            this->m_capacity = other.m_capacity;
-
-            if (this->m_array != nullptr)
+            if (this->m_array)
+            {
                 std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
+                this->m_count = other.m_count;
+                this->m_capacity = other.m_capacity;
+            }
+            else
+            {
+                std::printf("could not allocate block of memory...");
+                this->m_count = 0;
+                this->m_capacity = 0;
+            }
         }
     }
 
     ///
-    /// assigment operator. Deep copy of other
+    /// Assigment operator. Deep copy of "other"
     ///
     vector& operator=(const vector& other)
     {
@@ -158,7 +186,7 @@ public:
     }
 
     ///
-    /// move constructor
+    /// Move constructor
     ///
     vector(vector&& other)
         :   m_array{ other.m_array }, m_count{ other.m_count }, m_capacity{ other.m_capacity }
@@ -172,7 +200,7 @@ public:
     }
 
     ///
-    /// destructor
+    /// Destructor
     ///
     ~vector()
     {
@@ -184,7 +212,7 @@ public:
     }
 
     ///
-    /// assigment operator
+    /// Assigment operator
     ///
     vector& operator=(vector&& other)
     {
@@ -203,7 +231,7 @@ public:
     }
 
     ///
-    /// amount of elements in the vector
+    /// Amount of elements in the vector
     ///
     auto size() const -> size_type
     {
@@ -211,7 +239,7 @@ public:
     }
 
     ///
-    /// returns the size of the block of memory held by the vector
+    /// Returns the size of the underlying block of memory held by this vector
     ///
     auto capacity() const -> size_type
     {
@@ -219,7 +247,7 @@ public:
     }
 
     ///
-    /// return true if the vector is has no elements
+    /// Return true if this vector has no elements, fase otherwise
     ///
     auto empty() const -> bool
     {
@@ -227,7 +255,7 @@ public:
     }
 
     ///
-    /// return reference to element at postion "index"
+    /// Returns reference to element at postion "index"
     ///
     auto operator[](size_type index) -> T&
     {
@@ -235,7 +263,7 @@ public:
     }
 
     ///
-    /// return constant reference to element at postion "index"
+    /// Returns constant reference to element at postion "index"
     ///
     auto operator[](size_type index) const -> const_reference
     {
@@ -243,8 +271,9 @@ public:
     }
 
     ///
-    /// return constant reference to element at postion "index"
-    /// throws exceptions if index is not valid or vector is empty
+    /// Return reference to element at postion "index" throws "out_of_bounds"
+    /// exception if index is not within the range of valid elements
+    /// or "empty_vector" if the vector has no elements
     ///
     auto at(size_type index) -> T&
     {
@@ -252,21 +281,30 @@ public:
         {
             if (this->m_count == 0)
                 throw empty_vector{};
-            if (not (index > 0 and index < this->m_count))
+            if (not (index < this->m_count))
                 throw out_of_bounds{};
 
         }
-        catch (const out_of_bounds& oob) { std::printf("%s", oob.what()); }
-        catch (const empty_vector& ema) { std::printf("%s", ema.what()); }
-        catch(...) { std::printf("Other exceptions thrown"); }
+        catch (const out_of_bounds& oob)
+        {
+            std::printf("%s", oob.what());
+        }
+        catch (const empty_vector& ema)
+        {
+            std::printf("%s", ema.what());
+        }
+        catch(...)
+        {
+            std::printf("Other exceptions thrown");
+        }
 
         return this->m_array[index];
     }
 
     ///
-    /// return constant reference to element at postion "index"
-    /// throws "out_of_bounds" exception if index is not within the range valid elements
-    /// or "empty_vector" if the vector has no elements
+    /// Return constant reference to element at postion "index" throws "out_of_bounds"
+    /// exception if index is not within the range of valid elements or "empty_vector"
+    /// if the vector has no elements
     ///
     auto at(size_type index) const -> const_reference
     {
@@ -274,7 +312,7 @@ public:
         {
             if (this->m_count == 0)
                 throw empty_vector{};
-            if (not (index > 0 and index < this->m_count))
+            if (not (index < this->m_count))
                 throw out_of_bounds{};
 
         }
@@ -295,7 +333,7 @@ public:
     }
 
     ///
-    /// reserve a block of memory to hold count elements
+    /// Reserve a block of memory to hold count elements
     ///
     auto reserve(size_type count) -> void
     {
@@ -307,7 +345,7 @@ public:
     }
 
     ///
-    /// Ajust vector to contain count elements
+    /// Adjust vector to contain count elements
     ///
     auto resize(size_type count) -> void;
 
@@ -354,7 +392,7 @@ public:
 
     ///
     /// Insert one element at the end of the vector
-    /// with support on move semantics
+    /// with support for move semantics
     ///
     auto push_back(T&& info) -> void
     {
@@ -394,20 +432,22 @@ public:
     ///
     auto pop_back() -> void
     {
-        if (m_count != 0)
+        if (this->m_count != 0)
         {
-            m_array[m_count - 1].~T();
-            m_count -= 1;
+            this->m_array[this->m_count - 1].~T();
+            this->m_count -= 1;
         }
 
     }
 
     ///
-    /// Remove all elements of the vector
+    /// Remove all elements from the vector
     ///
     auto clear() -> void
     {
-        std::for_each(this->m_array, this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+        std::for_each(this->m_array,
+            this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+
         this->m_count = 0;
     }
 
@@ -417,7 +457,8 @@ public:
     auto begin() const -> pointer_type
     {
         // "this" should not be const here?
-        // used temporarily to solve ranged for issue with const kt::vector
+        // used temporarily to solve ranged for issue while
+        // declaring const kt::vector's
         return &(this->m_array[0]);
     }
 
@@ -426,13 +467,14 @@ public:
     ///
     auto end() const -> pointer_type
     {
-        // "this" should not be const here?
-        // used temorarily to solve ranged for issue with const kt::vector
+        // "this" should not be const here? same as kt::vector::begin
+        // used temporarily to solve ranged for issue while
+        // declaring const kt::vector's
         return &(this->m_array[this->m_count]);
     }
 
     ///
-    /// Returns a pointer to the beginning of the vector
+    /// Returns a pointer to const object from the beginning of the vector
     ///
     auto cbegin() const -> pointer_to_const_type
     {
@@ -440,7 +482,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to the end of the vector
+    /// Returns a pointer to const object past the last element of the vector
     ///
     auto cend() const -> pointer_to_const_type
     {
@@ -463,6 +505,9 @@ private:
 
         std::copy(this->m_array, this->m_array + this->m_count, new_block);
 
+        // destroy objects from old block of memory and free it
+        std::for_each(this->m_array,
+            this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
         ::operator delete(static_cast<void*>(this->m_array));
 
         this->m_array = new_block;
