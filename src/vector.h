@@ -355,6 +355,18 @@ public:
     void emplace_back();
 
     ///
+    /// Concatenate the contents of this vect and other
+    /// This vector contains the result of the concatenation
+    ///
+    void concatenate(const vector& other);
+
+    ///
+    /// Destroy the last n elements. If there is less than
+    /// count elements, it empties the vector
+    ///
+    void remove_n(size_type count);
+
+    ///
     /// Insert one element at the end of the vector
     ///
     auto push_back(const T& info) -> void
