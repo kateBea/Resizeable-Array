@@ -18,8 +18,7 @@
 
 namespace kt
 {
-template
-<typename T>
+template <typename T>
 class vector
 {
 public:
