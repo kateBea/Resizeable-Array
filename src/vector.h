@@ -25,7 +25,7 @@ public:
     using size_type             = std::size_t;
     using pointer_type          = T*;
     using const_pointer_type    = T* const;
-    using const_reference       = const T&;
+    using const_reference_type  = const T&;
     using pointer_to_const_type = const T*;
 
     ///
@@ -268,7 +268,7 @@ public:
     ///
     /// Returns constant reference to element at postion "index"
     ///
-    auto operator[](size_type index) const -> const_reference
+    auto operator[](size_type index) const -> const_reference_type
     {
         return this->m_array[index];
     }
@@ -309,7 +309,7 @@ public:
     /// exception if index is not within the range of valid elements or "empty_vector"
     /// if the vector has no elements
     ///
-    auto at(size_type index) const -> const_reference
+    auto at(size_type index) const -> const_reference_type
     {
         try
         {
@@ -471,9 +471,6 @@ public:
     ///
     auto begin() const -> pointer_type
     {
-        // "this" should not be const here?
-        // used temporarily to solve ranged for issue while
-        // declaring const kt::vector's
         return &(this->m_array[0]);
     }
 
@@ -482,9 +479,6 @@ public:
     ///
     auto end() const -> pointer_type
     {
-        // "this" should not be const here? same as kt::vector::begin
-        // used temporarily to solve ranged for issue while
-        // declaring const kt::vector's
         return &(this->m_array[this->m_count]);
     }
 
@@ -509,7 +503,7 @@ private:
 
     void reallocate()
     {
-        size_type new_block_size{ (!this->m_capacity) ? 1 : (m_capacity * grow_factor) };
+        size_type new_block_size{ (!this->m_capacity) ? 1 : (this->m_capacity * grow_factor) };
         pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow)) };
 
         if (not new_block)
