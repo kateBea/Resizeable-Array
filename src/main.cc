@@ -75,9 +75,9 @@ int main(int, char**)
 
     std::cout << std::endl;
 
-    std::cout << "-----------------------------------------\n";
+    std::cout << "-----------------------------------------" << std::endl;
 
-    std::cout << "***** DOING INSERTIONS *****\n";
+    std::cout << "***** DOING INSERTIONS *****" << std::endl;
     kt::vector<double> real_numbers{};
 
     real_numbers.push_back(4.33);
@@ -95,7 +95,7 @@ int main(int, char**)
     std::cout << std::endl;
     std::cout << "-----------------------------------------\n";
 
-    std::cout << "***** TESTING POP_BACK *****\n";
+    std::cout << "***** TESTING POP_BACK *****" << std::endl;
     kt::vector<Resource> res{};
 
     res.push_back(Resource(44));
@@ -105,9 +105,9 @@ int main(int, char**)
     res.push_back(Resource(88));
 
     for (std::size_t index{}; index < real_numbers.size(); ++index)
-        std::cout << "Printing resource with id: " << res[index].m_id << '\n';
+        std::cout << "Printing resource with id: " << res[index].m_id << std::endl;
 
-    std::cout << "Deleting resources aquired------------------------\n";
+    std::cout << "------------- Deleting resources aquired -------------" << std::endl;
     res.pop_back();
     res.pop_back();
     res.pop_back();
@@ -130,7 +130,7 @@ int main(int, char**)
     std::cout << "res vector current amount for elements: " << res.size() << std::endl;
     std::cout << "res vector current capacity: " << res.capacity() << std::endl;
 
-    std::cout << "***** CALL TO KATE::VECTOR::CLEAR *****\n";
+    std::cout << "***** CALL TO KATE::VECTOR::CLEAR *****" << std::endl;
     res.clear();
     std::cout << "res vector current amount for elements: " << res.size() << std::endl;
     std::cout << "res vector current capacity: " << res.capacity() << std::endl;
@@ -156,11 +156,39 @@ int main(int, char**)
         std::cout << it << ' ';
 
     std::cout << std::endl;
-    
+
     for (const auto& it : vector3copy)
         std::cout << it << ' ';
 
+    std::cout << "******* REMOVE_N TEST *******\n";
+    kt::vector<Resource> vec5{};
+
+    vec5.push_back(Resource(78));
+    vec5.push_back(Resource(29));
+    vec5.push_back(Resource(110));
+    vec5.push_back(Resource(265));
+
+    vec5.remove_n(7);
+
+    std::cout << "******* CONCATENATE TEST *******\n";
+    kt::vector<int> vec6{ 1, 2, 3, 4, 5 };
+    kt::vector<int> vec7{ 2, 4, 6, 8, 10 };
+
+    for (const auto& it : vec6)
+        std::cout << it << ' ';
 
     std::cout << std::endl;
+
+    for (const auto& it : vec7)
+        std::cout << it << ' ';
+
+    std::cout << std::endl;
+
+    vec6.append(vec7);
+
+    for (const auto& it : vec6)
+        std::cout << it << ' ';
+
+    std::cout << "\nFinishing program..." << std::endl;
     return 0;
 }
