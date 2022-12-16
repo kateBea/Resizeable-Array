@@ -23,6 +23,7 @@ class vector
 {
 public:
     using size_type             = std::size_t;
+    using reference_type        = T&;
     using pointer_type          = T*;
     using const_pointer_type    = T* const;
     using const_reference_type  = const T&;
@@ -355,19 +356,60 @@ public:
     ///
     /// Insert elements at the end
     ///
-    void emplace_back();
+    auto emplace_back() -> void;
 
     ///
-    /// Concatenate the contents of this vect and other
+    /// Concatenate the contents of this vector and "other"
     /// This vector contains the result of the concatenation
     ///
-    void concatenate(const vector& other);
+    auto append(const vector& other) -> void
+    {
+        if (not other.empty())
+        {
+            pointer_type new_block{ static_cast<pointer_type>
+                (::operator new(sizeof(T) * (this->m_count + other.m_count), std::nothrow)) };
+
+            if (new_block)
+            {
+                std::copy(this->m_array, this->m_array + this->m_count, new_block);
+                std::copy(other.m_array, other.m_array + other.m_count, new_block + this->m_count);
+
+                ::operator delete(static_cast<void*>(this->m_array));
+
+                this->m_array = new_block;
+                this->m_count = this->m_count + other.m_count;
+                this->m_capacity = this->m_count + other.m_count;
+
+            }
+            else
+            {
+                std::printf("failed to concatenate. Could not allocate block of memory...");
+                return;
+            }
+        }
+    }
 
     ///
     /// Destroy the last n elements. If there is less than
     /// count elements, it empties the vector
     ///
-    void remove_n(size_type count);
+    auto remove_n(size_type count) -> void
+    {
+        if (count < this->m_count)
+        {
+            std::for_each(this->m_array,
+                this->m_array + count, [](T& info) -> void { info.~T(); });
+
+            this->m_count -= count;
+        }
+        else
+        {
+            std::for_each(this->m_array,
+                this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+
+            this->m_count = 0;
+        }
+    }
 
     ///
     /// Insert one element at the end of the vector
@@ -523,6 +565,41 @@ private:
         this->m_capacity = new_block_size;
 
     }
+
+    class iterator
+    {
+    public:
+        explicit iterator(T* ptr) : p{ ptr } { }
+
+        // prefix increment
+        auto operator++() -> iterator { return (p = p + 1); }
+        // postfix increment
+        auto operator++(int) -> iterator { p++; return (p - 1); }
+
+        // prefix increment
+        auto operator--() -> iterator { return (p = p - 1); }
+        // postfix increment
+        auto operator--(int) -> iterator { p--; return (p + 1); }
+
+        friend bool operator!=(const iterator& rhs, const iterator& lhs)
+        {
+            return rhs.p == lhs.p;
+        }
+
+        friend bool operator==(const iterator& rhs, const iterator& lhs)
+        {
+            return rhs.p != lhs.p;
+        }
+
+        auto operator*() -> reference_type { return *p; }
+        auto operator->() -> pointer_type { return p; }
+
+        auto operator*() const -> const_reference_type { return *p; }
+        auto operator->() const -> pointer_to_const_type { return p; }
+
+    private:
+        pointer_type p{};
+    };
 
     class out_of_bounds : public std::exception
     {
