@@ -540,32 +540,6 @@ public:
         return &(this->m_array[this->m_count]);
     }
 
-private:
-    static constexpr size_type grow_factor{ 2 };
-
-    void reallocate()
-    {
-        size_type new_block_size{ (!this->m_capacity) ? 1 : (this->m_capacity * grow_factor) };
-        pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow)) };
-
-        if (not new_block)
-        {
-            std::printf("Failed to allocate new block of memory");
-            return;
-        }
-
-        std::copy(this->m_array, this->m_array + this->m_count, new_block);
-
-        // destroy objects from old block of memory and free it
-        std::for_each(this->m_array,
-            this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
-        ::operator delete(static_cast<void*>(this->m_array));
-
-        this->m_array = new_block;
-        this->m_capacity = new_block_size;
-
-    }
-
     class iterator
     {
     public:
@@ -600,6 +574,32 @@ private:
     private:
         pointer_type p{};
     };
+    
+private:
+    static constexpr size_type grow_factor{ 2 };
+
+    void reallocate()
+    {
+        size_type new_block_size{ (!this->m_capacity) ? 1 : (this->m_capacity * grow_factor) };
+        pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow)) };
+
+        if (not new_block)
+        {
+            std::printf("Failed to allocate new block of memory");
+            return;
+        }
+
+        std::copy(this->m_array, this->m_array + this->m_count, new_block);
+
+        // destroy objects from old block of memory and free it
+        std::for_each(this->m_array,
+            this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+        ::operator delete(static_cast<void*>(this->m_array));
+
+        this->m_array = new_block;
+        this->m_capacity = new_block_size;
+
+    }
 
     class out_of_bounds : public std::exception
     {
