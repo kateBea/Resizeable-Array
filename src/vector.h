@@ -581,14 +581,14 @@ private:
         // postfix increment
         auto operator--(int) -> iterator { p--; return (p + 1); }
 
-        friend bool operator!=(const iterator& rhs, const iterator& lhs)
+        auto operator!=(const iterator& other) -> bool
         {
-            return rhs.p == lhs.p;
+            return this->p == other.p;
         }
 
-        friend bool operator==(const iterator& rhs, const iterator& lhs)
+        auto operator==(const iterator& other) -> bool
         {
-            return rhs.p != lhs.p;
+            return this->p != other.p;
         }
 
         auto operator*() -> reference_type { return *p; }
