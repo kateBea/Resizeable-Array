@@ -209,7 +209,7 @@ public:
     {
         // size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
 
-        // alternative to the above. New block size represents the size in bytes of the new block
+        // alternative to the above. new_block_size represents the size in bytes of the new block
         size_type new_block_size{ std::distance(first.raw(), last.raw()) };
         // tho it throws narrowing conversion warning
         // vector.h: In instantiation of ‘kt::vector<T>::vector(kt::vector<T>::iterator, kt::vector<T>::iterator) [with T = double]’:
