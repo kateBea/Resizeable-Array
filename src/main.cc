@@ -174,6 +174,9 @@ int main(int, char**)
     kt::vector<int> vec6{ 1, 2, 3, 4, 5 };
     kt::vector<int> vec7{ 2, 4, 6, 8, 10 };
 
+    vec6.print();
+
+#if 0
     for (const auto& it : vec6)
         std::cout << it << ' ';
 
@@ -183,11 +186,13 @@ int main(int, char**)
         std::cout << it << ' ';
 
     std::cout << std::endl;
-
+#endif
     vec6.append(vec7);
 
+#if 0
     for (const auto& it : vec6)
         std::cout << it << ' ';
+#endif
 
     std::cout << "\nFinishing program..." << std::endl;
     return 0;
