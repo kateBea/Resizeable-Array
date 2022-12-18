@@ -14,8 +14,6 @@
 #include <iterator>
 #include <memory>
 
-#include <iostream>
-
 #define DEBUG_LOG(log_str)  std::cerr << log_str << '\n'
 
 namespace kt
@@ -619,7 +617,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to the beginning of the vector
+    /// Returns an iterator to the beginning of the vector
     ///
     auto begin() -> iterator
     {
@@ -627,7 +625,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to the end of the vector
+    /// Returns an iterator to the element past of the vector
     ///
     auto end() -> iterator
     {
@@ -635,7 +633,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to the beginning of the vector
+    /// Returns a constant iterator to the beginning of the vector
     ///
     auto begin() const -> const_iterator
     {
@@ -643,7 +641,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to the end of the vector
+    /// Returns a constant iterator past the last element of the vector
     ///
     auto end() const -> const_iterator
     {
@@ -651,7 +649,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to const object from the beginning of the vector
+    /// Returns a constant iterator to the beginning of the vector
     ///
     auto cbegin() const -> const_iterator
     {
@@ -659,7 +657,7 @@ public:
     }
 
     ///
-    /// Returns a pointer to const object past the last element of the vector
+    /// Returns a constant iterator past the last element of the vector
     ///
     auto cend() const -> const_iterator
     {
