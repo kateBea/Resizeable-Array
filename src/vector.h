@@ -22,17 +22,17 @@ template <typename T>
 class vector
 {
 public:
+    using value_type            = T;
     using size_type             = std::size_t;
     using reference_type        = T&;
     using pointer_type          = T*;
-    using const_pointer_type    = T* const;
     using const_reference_type  = const T&;
     using pointer_to_const_type = const T*;
 
     class iterator
     {
     public:
-        explicit iterator(T* ptr) : p{ ptr } { }
+        explicit iterator(pointer_type ptr) : p{ ptr } { }
 
         // prefix increment
         auto operator++() -> iterator
@@ -96,7 +96,7 @@ public:
     class const_iterator
     {
     public:
-        explicit const_iterator(T* ptr) : p{ ptr } { }
+        explicit const_iterator(pointer_type ptr) : p{ ptr } { }
 
         // prefix increment
         auto operator++() -> const_iterator
@@ -173,7 +173,7 @@ public:
         :   m_array{ nullptr }, m_count{ 0 }, m_capacity{ count }
     {
         if (count != 0)
-            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * count, std::nothrow));
+            this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * count, std::nothrow));
 
         if (not this->m_array)
         {
@@ -187,7 +187,7 @@ public:
     /// with the elements from "content"
     ///
     vector(std::initializer_list<T>&& content)
-        :   m_array{ static_cast<pointer_type>(::operator new(sizeof(T) * content.size(), std::nothrow)) },
+        :   m_array{ static_cast<pointer_type>(::operator new(sizeof(value_type) * content.size(), std::nothrow)) },
             m_count{ content.size() }, m_capacity{ content.size() }
     {
         if (this->m_array)
@@ -249,7 +249,7 @@ public:
         // TODO: still needs testing
         if (count != 0)
         {
-            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * count, std::nothrow));
+            this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * count, std::nothrow));
 
             if (this->m_array)
             {
@@ -274,7 +274,7 @@ public:
     {
         if (other.m_count != 0)
         {
-            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * other.m_count, std::nothrow));
+            this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * other.m_count, std::nothrow));
 
             if (this->m_array)
             {
@@ -303,7 +303,7 @@ public:
                 this->m_array[index].~T();
             ::operator delete(this->m_array);
 
-            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * other.m_count, std::nothrow));
+            this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * other.m_count, std::nothrow));
 
             if (this->m_array)
             {
@@ -408,7 +408,7 @@ public:
     /// exception if index is not within the range of valid elements
     /// or "empty_vector" if the vector has no elements
     ///
-    auto at(size_type index) -> T&
+    auto at(size_type index) -> reference_type
     {
         try
         {
@@ -496,7 +496,7 @@ public:
         if (not other.empty())
         {
             pointer_type new_block{ static_cast<pointer_type>
-                (::operator new(sizeof(T) * (this->m_count + other.m_count), std::nothrow)) };
+                (::operator new(sizeof(value_type) * (this->m_count + other.m_count), std::nothrow)) };
 
             if (new_block)
             {
@@ -527,14 +527,14 @@ public:
         if (count < this->m_count)
         {
             std::for_each(this->m_array,
-                this->m_array + count, [](T& info) -> void { info.~T(); });
+                this->m_array + count, [](reference_type info) -> void { info.~T(); });
 
             this->m_count -= count;
         }
         else
         {
             std::for_each(this->m_array,
-                this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+                this->m_array + this->m_count, [](reference_type info) -> void { info.~T(); });
 
             this->m_count = 0;
         }
@@ -543,7 +543,7 @@ public:
     ///
     /// Insert one element at the end of the vector
     ///
-    auto push_back(const T& info) -> void
+    auto push_back(const_reference_type info) -> void
     {
         // if capacity == count:
         // allocate new block
