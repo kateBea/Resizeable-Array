@@ -209,7 +209,7 @@ public:
     {
         // size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
 
-        // alternative to the above. new_block_size represents the size in bytes of the new block
+        // alternative to the above.
         size_type new_block_size{ std::distance(first.raw(), last.raw()) };
         // tho it throws narrowing conversion warning
         // vector.h: In instantiation of ‘kt::vector<T>::vector(kt::vector<T>::iterator, kt::vector<T>::iterator) [with T = double]’:
@@ -221,6 +221,7 @@ public:
         // copy elements if the range between "first" and "last" is not empty
         if (new_block_size != 0)
         {
+            // new_block_size represents the size in bytes of the new block
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow));
 
             if (this->m_array)
