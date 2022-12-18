@@ -68,19 +68,16 @@ public:
 
         auto operator!=(const iterator& other) -> bool
         {
-            return this->p == other.p;
+            return this->p != other.p;
         }
 
         auto operator==(const iterator& other) -> bool
         {
-            return this->p != other.p;
+            return this->p == other.p;
         }
 
         auto operator*() -> reference_type { return *p; }
         auto operator->() -> pointer_type { return p; }
-
-        auto operator*() const -> const_reference_type { return *p; }
-        auto operator->() const -> pointer_to_const_type { return p; }
 
         auto raw() const -> pointer_type { return p; }
 
@@ -88,45 +85,55 @@ public:
         pointer_type p{};
     };
 
-    void print()
-    {
-        iterator it{ this->begin() };
-        iterator it_las{ this->end() };
-
-        for ( ; it != it_last; ++it)
-            std::cout << *it << std::endl;
-    }
-
     class const_iterator
     {
     public:
         explicit const_iterator(T* ptr) : p{ ptr } { }
 
         // prefix increment
-        auto operator++() -> iterator { return (p = p + 1); }
-        // postfix increment
-        auto operator++(int) -> iterator { p++; return (p - 1); }
-
-        // prefix increment
-        auto operator--() -> iterator { return (p = p - 1); }
-        // postfix increment
-        auto operator--(int) -> iterator { p--; return (p + 1); }
-
-        auto operator!=(const iterator& other) -> bool
+        auto operator++() -> const_iterator
         {
-            return this->p == other.p;
+            ++p;
+            return *this;
         }
 
-        auto operator==(const iterator& other) -> bool
+        // postfix increment
+        auto operator++(int) -> const_iterator
+        {
+            auto res{ p };
+            ++p;
+            return const_iterator{ res };
+        }
+
+        // prefix increment
+        auto operator--() -> const_iterator
+        {
+            --p;
+            return *this;
+        }
+
+        // postfix increment
+        auto operator--(int) -> const_iterator
+        {
+            auto res{ p };
+            --p;
+            return const_iterator{ res };
+        }
+
+        auto operator!=(const const_iterator& other) -> bool
         {
             return this->p != other.p;
         }
 
-        auto operator*() -> reference_type { return *p; }
+        auto operator==(const const_iterator& other) -> bool
+        {
+            return this->p == other.p;
+        }
+
+        auto operator*() -> const_reference_type { return *p; }
         auto operator->() -> pointer_type { return p; }
 
-        auto operator*() const -> const_reference_type { return *p; }
-        auto operator->() const -> pointer_to_const_type { return p; }
+        auto raw() const -> pointer_type { return p; }
 
     private:
         pointer_type p{};
@@ -217,7 +224,7 @@ public:
     /// Parametrized constructor. Initialize this vector with "count"
     /// elements starting from "begin"
     ///
-    vector(const_pointer_type first, size_type count)
+    vector(iterator first, size_type count)
         :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
     {
         // TODO: still needs testing
@@ -227,7 +234,7 @@ public:
 
             if (this->m_array)
             {
-                std::copy(first, first + count, this->m_array);
+                std::copy(first.raw(), first.raw() + count, this->m_array);
                 this->m_count = count;
                 this->m_capacity = count;
             }
@@ -614,7 +621,7 @@ public:
     ///
     /// Returns a pointer to the beginning of the vector
     ///
-    auto begin() const -> iterator
+    auto begin() -> iterator
     {
         return iterator{ this->m_array };
     }
@@ -622,9 +629,25 @@ public:
     ///
     /// Returns a pointer to the end of the vector
     ///
-    auto end() const -> iterator
+    auto end() -> iterator
     {
         return iterator{ this->m_array + this->m_count };
+    }
+
+    ///
+    /// Returns a pointer to the beginning of the vector
+    ///
+    auto begin() const -> const_iterator
+    {
+        return const_iterator{ this->m_array };
+    }
+
+    ///
+    /// Returns a pointer to the end of the vector
+    ///
+    auto end() const -> const_iterator
+    {
+        return const_iterator{ this->m_array + this->m_count };
     }
 
     ///
