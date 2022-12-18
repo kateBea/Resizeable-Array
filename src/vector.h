@@ -207,17 +207,18 @@ public:
     vector(iterator first, iterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
-
+        //size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
+        size_type new_block_size{ std::distance(first.raw(), last.raw()) };
         // alternative: the problem with this is that std::distance returns a difference type which
         // seems to be typedef of long int thus leading to narrowing conversion essentially halving the
         // maximum size of memory we can allocate (not taking into account tha
         // fact that long int is converted to long unsigned int). Bellow example error from g++ 11 while testing
 
-        // warning: narrowing conversion of ‘std::distance<double*>(((const_pointer_type)first), ((const_pointer_type)last))’ from ‘std::iterator_traits<double*>::difference_type’ {aka ‘long int’} to ‘kt::vector<double>::size_type’ {aka ‘long unsigned int’} [-Wnarrowing]
-        // 70 |         size_type new_block_size{ std::distance(first, last) };
-
-        // size_type new_block_size{ static_cast<size_type>(std::distance(first, last)) };
+        // vector.h: In instantiation of ‘kt::vector<T>::vector(kt::vector<T>::iterator, kt::vector<T>::iterator) [with T = double]’:
+        // vector_move_ctor.cc:153:72:   required from here
+        // vector.h:211:48: warning: narrowing conversion of ‘std::distance<double*>(first.kt::vector<double>::iterator::raw(), last.kt::vector<double>::iterator::raw())’ from ‘std::iterator_traits<double*>::difference_type’ {aka ‘long int’} to ‘kt::vector<double>::size_type’ {aka ‘long unsigned int’} [-Wnarrowing]
+        // 211 |         size_type new_block_size{ std::distance(first.raw(), last.raw()) };
+        // |                                   ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
 
         // copy elements if the range between "first" and "last" is not empty
         if (new_block_size != 0)
