@@ -14,6 +14,8 @@
 #include <iterator>
 #include <memory>
 
+#include <iostream>
+
 #define DEBUG_LOG(log_str)  std::cerr << log_str << '\n'
 
 namespace kt
@@ -35,14 +37,34 @@ public:
         explicit iterator(T* ptr) : p{ ptr } { }
 
         // prefix increment
-        auto operator++() -> iterator { ++p; return *this; }
+        auto operator++() -> iterator
+        {
+            ++p;
+            return *this;
+        }
+
         // postfix increment
-        auto operator++(int) -> iterator { auto res{ p }; ++p; return iterator{ res }; }
+        auto operator++(int) -> iterator
+        {
+            auto res{ p };
+            ++p;
+            return iterator{ res };
+        }
 
         // prefix increment
-        auto operator--() -> iterator { --p; return *this; }
+        auto operator--() -> iterator
+        {
+            --p;
+            return *this;
+        }
+
         // postfix increment
-        auto operator--(int) -> iterator { auto res{ p }; --p; return iterator{ res }; }
+        auto operator--(int) -> iterator
+        {
+            auto res{ p };
+            --p;
+            return iterator{ res };
+        }
 
         auto operator!=(const iterator& other) -> bool
         {
@@ -65,6 +87,15 @@ public:
     private:
         pointer_type p{};
     };
+
+    void print()
+    {
+        iterator it{ this->begin() };
+        iterator it_las{ this->end() };
+
+        for ( ; it != it_last; ++it)
+            std::cout << *it << std::endl;
+    }
 
     class const_iterator
     {
@@ -170,7 +201,7 @@ public:
 
             if (this->m_array)
             {
-                std::copy(first, last, this->m_array);
+                std::copy(first.raw(), last.raw(), this->m_array);
                 this->m_count = new_block_size;
                 this->m_capacity = new_block_size;
 
@@ -585,7 +616,7 @@ public:
     ///
     auto begin() const -> iterator
     {
-        return iterator{ &(this->m_array[0]) };
+        return iterator{ this->m_array };
     }
 
     ///
@@ -593,7 +624,7 @@ public:
     ///
     auto end() const -> iterator
     {
-        return iterator{ &(this->m_array[this->m_count]) };
+        return iterator{ this->m_array + this->m_count };
     }
 
     ///
