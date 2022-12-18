@@ -29,6 +29,78 @@ public:
     using const_reference_type  = const T&;
     using pointer_to_const_type = const T*;
 
+    class iterator
+    {
+    public:
+        explicit iterator(T* ptr) : p{ ptr } { }
+
+        // prefix increment
+        auto operator++() -> iterator { ++p; return *this; }
+        // postfix increment
+        auto operator++(int) -> iterator { auto res{ p }; ++p; return iterator{ res }; }
+
+        // prefix increment
+        auto operator--() -> iterator { --p; return *this; }
+        // postfix increment
+        auto operator--(int) -> iterator { auto res{ p }; --p; return iterator{ res }; }
+
+        auto operator!=(const iterator& other) -> bool
+        {
+            return this->p == other.p;
+        }
+
+        auto operator==(const iterator& other) -> bool
+        {
+            return this->p != other.p;
+        }
+
+        auto operator*() -> reference_type { return *p; }
+        auto operator->() -> pointer_type { return p; }
+
+        auto operator*() const -> const_reference_type { return *p; }
+        auto operator->() const -> pointer_to_const_type { return p; }
+
+        auto raw() const -> pointer_type { return p; }
+
+    private:
+        pointer_type p{};
+    };
+
+    class const_iterator
+    {
+    public:
+        explicit const_iterator(T* ptr) : p{ ptr } { }
+
+        // prefix increment
+        auto operator++() -> iterator { return (p = p + 1); }
+        // postfix increment
+        auto operator++(int) -> iterator { p++; return (p - 1); }
+
+        // prefix increment
+        auto operator--() -> iterator { return (p = p - 1); }
+        // postfix increment
+        auto operator--(int) -> iterator { p--; return (p + 1); }
+
+        auto operator!=(const iterator& other) -> bool
+        {
+            return this->p == other.p;
+        }
+
+        auto operator==(const iterator& other) -> bool
+        {
+            return this->p != other.p;
+        }
+
+        auto operator*() -> reference_type { return *p; }
+        auto operator->() -> pointer_type { return p; }
+
+        auto operator*() const -> const_reference_type { return *p; }
+        auto operator->() const -> pointer_to_const_type { return p; }
+
+    private:
+        pointer_type p{};
+    };
+
     ///
     /// Default constructor
     ///
@@ -76,10 +148,10 @@ public:
     /// Parametrized constructor. Initialize this vector with elements
     /// within the ranged given by "first" and "last"
     ///
-    vector(const_pointer_type first, const_pointer_type last)
+    vector(iterator first, iterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        size_type new_block_size{ (reinterpret_cast<size_type>(last) - reinterpret_cast<size_type>(first)) / sizeof(T) };
+        size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
 
         // alternative: the problem with this is that std::distance returns a difference type which
         // seems to be typedef of long int thus leading to narrowing conversion essentially halving the
@@ -511,17 +583,17 @@ public:
     ///
     /// Returns a pointer to the beginning of the vector
     ///
-    auto begin() const -> pointer_type
+    auto begin() const -> iterator
     {
-        return &(this->m_array[0]);
+        return iterator{ &(this->m_array[0]) };
     }
 
     ///
     /// Returns a pointer to the end of the vector
     ///
-    auto end() const -> pointer_type
+    auto end() const -> iterator
     {
-        return &(this->m_array[this->m_count]);
+        return iterator{ &(this->m_array[this->m_count]) };
     }
 
     ///
@@ -540,41 +612,7 @@ public:
         return &(this->m_array[this->m_count]);
     }
 
-    class iterator
-    {
-    public:
-        explicit iterator(T* ptr) : p{ ptr } { }
 
-        // prefix increment
-        auto operator++() -> iterator { return (p = p + 1); }
-        // postfix increment
-        auto operator++(int) -> iterator { p++; return (p - 1); }
-
-        // prefix increment
-        auto operator--() -> iterator { return (p = p - 1); }
-        // postfix increment
-        auto operator--(int) -> iterator { p--; return (p + 1); }
-
-        auto operator!=(const iterator& other) -> bool
-        {
-            return this->p == other.p;
-        }
-
-        auto operator==(const iterator& other) -> bool
-        {
-            return this->p != other.p;
-        }
-
-        auto operator*() -> reference_type { return *p; }
-        auto operator->() -> pointer_type { return p; }
-
-        auto operator*() const -> const_reference_type { return *p; }
-        auto operator->() const -> pointer_to_const_type { return p; }
-
-    private:
-        pointer_type p{};
-    };
-    
 private:
     static constexpr size_type grow_factor{ 2 };
 
