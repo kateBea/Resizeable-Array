@@ -64,6 +64,16 @@ public:
             return iterator{ res };
         }
 
+        auto operator+(size_type count) -> iterator
+        {
+            return iterator{ this->p + count };
+        }
+
+        auto operator-(size_type count) -> iterator
+        {
+            return iterator{ this->p - count };
+        }
+
         auto operator!=(const iterator& other) -> bool
         {
             return this->p != other.p;
@@ -116,6 +126,16 @@ public:
             auto res{ p };
             --p;
             return const_iterator{ res };
+        }
+
+        auto operator+(size_type count) -> const_iterator
+        {
+            return const_iterator{ this->p + count };
+        }
+
+        auto operator-(size_type count) -> const_iterator
+        {
+            return const_iterator{ this->p - count };
         }
 
         auto operator!=(const const_iterator& other) -> bool
