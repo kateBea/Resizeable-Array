@@ -207,13 +207,11 @@ public:
     vector(iterator first, iterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        //size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
-        size_type new_block_size{ std::distance(first.raw(), last.raw()) };
-        // alternative: the problem with this is that std::distance returns a difference type which
-        // seems to be typedef of long int thus leading to narrowing conversion essentially halving the
-        // maximum size of memory we can allocate (not taking into account tha
-        // fact that long int is converted to long unsigned int). Bellow example error from g++ 11 while testing
+        // size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
 
+        // alternative to the above. New block size represents the size in bytes of the new block
+        size_type new_block_size{ std::distance(first.raw(), last.raw()) };
+        // tho it throws narrowing conversion warning
         // vector.h: In instantiation of ‘kt::vector<T>::vector(kt::vector<T>::iterator, kt::vector<T>::iterator) [with T = double]’:
         // vector_move_ctor.cc:153:72:   required from here
         // vector.h:211:48: warning: narrowing conversion of ‘std::distance<double*>(first.kt::vector<double>::iterator::raw(), last.kt::vector<double>::iterator::raw())’ from ‘std::iterator_traits<double*>::difference_type’ {aka ‘long int’} to ‘kt::vector<double>::size_type’ {aka ‘long unsigned int’} [-Wnarrowing]
