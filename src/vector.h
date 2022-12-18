@@ -653,17 +653,17 @@ public:
     ///
     /// Returns a pointer to const object from the beginning of the vector
     ///
-    auto cbegin() const -> pointer_to_const_type
+    auto cbegin() const -> const_iterator
     {
-        return &(this->m_array[0]);
+        return const_iterator{ this->m_array };
     }
 
     ///
     /// Returns a pointer to const object past the last element of the vector
     ///
-    auto cend() const -> pointer_to_const_type
+    auto cend() const -> const_iterator
     {
-        return &(this->m_array[this->m_count]);
+        return const_iterator{ this->m_array + this->m_count };
     }
 
 
@@ -731,6 +731,6 @@ private:
     // m_capacity >= m_count >= 0
 };
 
-}   // END KATE NAMESPACE
+}   // END KT NAMESPACE
 
 #endif
