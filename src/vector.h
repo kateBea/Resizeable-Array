@@ -191,7 +191,9 @@ public:
             m_count{ content.size() }, m_capacity{ content.size() }
     {
         if (this->m_array)
-            std::copy(content.begin(), content.end(), this->m_array);
+            std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(content.begin()),
+                content.size() * sizeof(value_type));
+            // std::copy(content.begin(), content.end(), this->m_array);
         else
         {
             std::printf("could not allocate block of memory...");
@@ -207,30 +209,21 @@ public:
     vector(iterator first, iterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        // size_type new_block_size{ (reinterpret_cast<size_type>(last.raw()) - reinterpret_cast<size_type>(first.raw())) / sizeof(T) };
+        // represents the amount of bytes between first and last
+        size_type new_block_size{ sizeof(value_type) * std::distance(first.raw(), last.raw()) };
 
-        // alternative to the above.
-        size_type new_block_size{ std::distance(first.raw(), last.raw()) };
-        // tho it throws narrowing conversion warning
-        // vector.h: In instantiation of ‘kt::vector<T>::vector(kt::vector<T>::iterator, kt::vector<T>::iterator) [with T = double]’:
-        // vector_move_ctor.cc:153:72:   required from here
-        // vector.h:211:48: warning: narrowing conversion of ‘std::distance<double*>(first.kt::vector<double>::iterator::raw(), last.kt::vector<double>::iterator::raw())’ from ‘std::iterator_traits<double*>::difference_type’ {aka ‘long int’} to ‘kt::vector<double>::size_type’ {aka ‘long unsigned int’} [-Wnarrowing]
-        // 211 |         size_type new_block_size{ std::distance(first.raw(), last.raw()) };
-        // |                                   ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // copy elements if the range between "first" and "last" is not empty
         if (new_block_size != 0)
         {
             // new_block_size represents the size in bytes of the new block
-            this->m_array = static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow));
+            this->m_array = static_cast<pointer_type>(::operator new(new_block_size, std::nothrow));
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(first.raw()),
-                    new_block_size * sizeof(value_type));
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(first.raw()),
+                    new_block_size );
                 //std::copy(first.raw(), last.raw(), this->m_array);
-                this->m_count = new_block_size;
-                this->m_capacity = new_block_size;
+                this->m_count = new_block_size / sizeof(value_type);
+                this->m_capacity = new_block_size / sizeof(value_type);
 
             }
             else
@@ -254,7 +247,7 @@ public:
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(first.raw()),
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(first.raw()),
                     count * sizeof(value_type));
                 // std::copy(first.raw(), first.raw() + count, this->m_array);
                 this->m_count = count;
@@ -281,7 +274,7 @@ public:
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(other.m_array),
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(other.m_array),
                     other.m_count * sizeof(value_type));
                 // std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
                 this->m_count = other.m_count;
@@ -312,7 +305,7 @@ public:
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(other.m_array),
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(other.m_array),
                     other.m_count * sizeof(value_type));
                 // std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
                 this->m_count = other.m_count;
@@ -507,9 +500,9 @@ public:
 
             if (new_block)
             {
-                std::memcpy(static_cast<void*>(new_block), static_cast<void*>(this->m_array),
+                std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),
                     this->m_count * sizeof(value_type));
-                std::memcpy(static_cast<void*>(new_block + this->m_count), static_cast<void*>(other.m_array),
+                std::memcpy(static_cast<void*>(new_block + this->m_count), static_cast<const void*>(other.m_array),
                     other.m_count * sizeof(value_type));
 
                 ::operator delete(static_cast<void*>(this->m_array));
@@ -709,8 +702,9 @@ private:
             return;
         }
 
-        std::memcpy(static_cast<void*>(new_block), static_cast<void*>(this->m_array),
+        std::memcpy(static_cast<void*>(new_block), static_cast< const void*>(this->m_array),
             this->m_count * sizeof(value_type));
+
         ::operator delete(static_cast<void*>(this->m_array));
 
         this->m_array = new_block;
