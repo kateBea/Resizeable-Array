@@ -128,28 +128,28 @@ public:
             return const_iterator{ res };
         }
 
-        auto operator+(size_type count) -> const_iterator
+        auto operator+(size_type count) const -> const_iterator
         {
             return const_iterator{ this->p + count };
         }
 
-        auto operator-(size_type count) -> const_iterator
+        auto operator-(size_type count) const -> const_iterator
         {
             return const_iterator{ this->p - count };
         }
 
-        auto operator!=(const const_iterator& other) -> bool
+        auto operator!=(const const_iterator& other) const -> bool
         {
             return this->p != other.p;
         }
 
-        auto operator==(const const_iterator& other) -> bool
+        auto operator==(const const_iterator& other) const -> bool
         {
             return this->p == other.p;
         }
 
-        auto operator*() -> const_reference_type { return *p; }
-        auto operator->() -> pointer_type { return p; }
+        auto operator*() const -> const_reference_type { return *p; }
+        auto operator->() const -> pointer_type { return p; }
 
         auto raw() const -> pointer_type { return p; }
 
@@ -226,7 +226,9 @@ public:
 
             if (this->m_array)
             {
-                std::copy(first.raw(), last.raw(), this->m_array);
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(first.raw()),
+                    new_block_size * sizeof(value_type));
+                //std::copy(first.raw(), last.raw(), this->m_array);
                 this->m_count = new_block_size;
                 this->m_capacity = new_block_size;
 
@@ -252,7 +254,9 @@ public:
 
             if (this->m_array)
             {
-                std::copy(first.raw(), first.raw() + count, this->m_array);
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(first.raw()),
+                    count * sizeof(value_type));
+                // std::copy(first.raw(), first.raw() + count, this->m_array);
                 this->m_count = count;
                 this->m_capacity = count;
             }
@@ -277,7 +281,9 @@ public:
 
             if (this->m_array)
             {
-                std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(other.m_array),
+                    other.m_count * sizeof(value_type));
+                // std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
                 this->m_count = other.m_count;
                 this->m_capacity = other.m_capacity;
             }
@@ -306,7 +312,9 @@ public:
 
             if (this->m_array)
             {
-                std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
+                std::memcpy(static_cast<void*>(this->m_array), static_cast<void*>(other.m_array),
+                    other.m_count * sizeof(value_type));
+                // std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
                 this->m_count = other.m_count;
                 this->m_capacity = other.m_capacity;
             }
@@ -389,7 +397,7 @@ public:
     ///
     /// Returns reference to element at postion "index"
     ///
-    auto operator[](size_type index) -> T&
+    auto operator[](size_type index) -> reference_type
     {
         return this->m_array[index];
     }
@@ -499,8 +507,10 @@ public:
 
             if (new_block)
             {
-                std::copy(this->m_array, this->m_array + this->m_count, new_block);
-                std::copy(other.m_array, other.m_array + other.m_count, new_block + this->m_count);
+                std::memcpy(static_cast<void*>(new_block), static_cast<void*>(this->m_array),
+                    this->m_count * sizeof(value_type));
+                std::memcpy(static_cast<void*>(new_block + this->m_count), static_cast<void*>(other.m_array),
+                    other.m_count * sizeof(value_type));
 
                 ::operator delete(static_cast<void*>(this->m_array));
 
@@ -699,11 +709,8 @@ private:
             return;
         }
 
-        std::copy(this->m_array, this->m_array + this->m_count, new_block);
-
-        // destroy objects from old block of memory and free it
-        std::for_each(this->m_array,
-            this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+        std::memcpy(static_cast<void*>(new_block), static_cast<void*>(this->m_array),
+            this->m_count * sizeof(value_type));
         ::operator delete(static_cast<void*>(this->m_array));
 
         this->m_array = new_block;
