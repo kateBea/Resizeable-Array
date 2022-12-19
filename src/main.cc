@@ -1,5 +1,6 @@
 #include "vector.h"
 #include <iostream>
+#include <memory>
 
 class Resource
 {
@@ -151,6 +152,7 @@ int main(int, char**)
     std::cout << "****** TESTING CONSTRUCTOR WITH ITERATORS ******" << std::endl;
     kt::vector<double> vector3{ 3.44, 5.22, -5.66, 8.11, 9.23, 10.34 };
     const kt::vector<double> vector3copy(vector3.begin(), vector3.end());
+    std::cout << "vector3copy size: " << vector3copy.size() << std::endl;
 
     for (auto& it : vector3)
         std::cout << it << ' ';
@@ -160,7 +162,7 @@ int main(int, char**)
     for (const auto& it : vector3copy)
         std::cout << it << ' ';
 
-    std::cout << "******* REMOVE_N TEST *******\n";
+    std::cout << "\n******* REMOVE_N TEST *******\n";
     kt::vector<Resource> vec5{};
 
     vec5.push_back(Resource(78));
@@ -197,6 +199,12 @@ int main(int, char**)
     for (const auto& it : vec_copy)
         std::cout << it << ' ';
 
+#if 0
+    kt::vector<std::unique_ptr<double>> ptrs{};
+
+    for (int i = 0; i < 10; ++i)
+        ptrs.push_back(std::make_unique<double>(4.5 * 3.0 * i));
+#endif
 
     std::cout << std::endl;
     return 0;
