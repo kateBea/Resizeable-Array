@@ -2,17 +2,17 @@
 #define VECTOR_HH
 
 // C++ standard library includes
-#include <cstdio>
 #include <new>
+#include <cstdio>
+#include <memory>
 #include <cstring>
-#include <exception>
 #include <cstdint>
 #include <utility>
-#include <initializer_list>
-#include <string_view>
-#include <algorithm>
 #include <iterator>
-#include <memory>
+#include <algorithm>
+#include <exception>
+#include <string_view>
+#include <initializer_list>
 
 #define DEBUG_LOG(log_str)  std::cerr << log_str << '\n'
 
@@ -27,7 +27,6 @@ public:
     using reference_type        = T&;
     using pointer_type          = T*;
     using const_reference_type  = const T&;
-    using pointer_to_const_type = const T*;
 
     class iterator
     {
@@ -485,7 +484,15 @@ public:
     ///
     /// Insert elements at the end
     ///
-    auto emplace_back() -> void;
+    template <typename... Args>
+    auto emplace_back(Args&&... args) -> void
+    {
+        if (this->m_count == this->m_capacity)
+            reallocate();
+
+        // construct in place
+        new(&this->m_array[this->m_count++]) value_type(std::forward<Args>(args)...);
+    }
 
     ///
     /// Concatenate the contents of this vector and "other"
@@ -693,8 +700,8 @@ private:
 
     void reallocate()
     {
-        size_type new_block_size{ (!this->m_capacity) ? 1 : (this->m_capacity * grow_factor) };
-        pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_size, std::nothrow)) };
+        size_type new_block_count{ (!this->m_capacity) ? 1 : (this->m_capacity * grow_factor) };
+        pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_count, std::nothrow)) };
 
         if (not new_block)
         {
@@ -702,13 +709,13 @@ private:
             return;
         }
 
-        std::memcpy(static_cast<void*>(new_block), static_cast< const void*>(this->m_array),
+        std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),
             this->m_count * sizeof(value_type));
 
         ::operator delete(static_cast<void*>(this->m_array));
 
         this->m_array = new_block;
-        this->m_capacity = new_block_size;
+        this->m_capacity = new_block_count;
 
     }
 
