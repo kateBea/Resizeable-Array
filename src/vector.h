@@ -565,7 +565,7 @@ public:
         // increase count by 1
         if (this->m_capacity > this->m_count)
         {
-            this->m_array[this->m_count] = info;
+            new(&this->m_array[this->m_count]) value_type(info);
             this->m_count += 1;
         }
         else
@@ -580,7 +580,7 @@ public:
                 return;
             }
 
-            this->m_array[this->m_count] = info;
+            new(&this->m_array[this->m_count]) value_type(info);
             this->m_count += 1;
         }
     }
@@ -602,7 +602,7 @@ public:
         // increase count by 1
         if (this->m_capacity > this->m_count)
         {
-            m_array[this->m_count] = std::move(info);
+            new(&this->m_array[this->m_count]) value_type(std::move(info));
             this->m_count += 1;
         }
         else
@@ -617,7 +617,7 @@ public:
                 return;
             }
 
-            this->m_array[this->m_count] = std::move(info);
+            new(&this->m_array[this->m_count]) value_type(std::move(info));
             this->m_count += 1;
         }
     }
