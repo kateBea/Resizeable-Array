@@ -212,11 +212,23 @@ int main(int, char**)
     stuff.emplace_back();
     stuff.emplace_back();
     stuff.emplace_back();
+    stuff.emplace_back(55);
 
     for (const auto& it : stuff)
         std::cout << it.m_id << ' ';
 
+    std::cout << std::endl;
 
+    for (auto it{ stuff.begin() }; it != stuff.end(); ++it)
+        std::cout << it->m_id << std::endl;
+
+    for (kt::vector<Resource>::const_iterator it{ stuff.cbegin() }; it != stuff.cend(); ++it)
+        std::cout << it->m_id << std::endl;
+
+    std::cout << std::endl;
+
+    std::cout << "stuff size(): " << stuff.size() << std::endl;
+    std::cout << "stuff capacity(): " << stuff.capacity() << std::endl;
 
 
 
