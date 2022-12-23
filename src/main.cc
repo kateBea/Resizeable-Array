@@ -192,7 +192,6 @@ int main(int, char**)
     for (const auto& it : vec6)
         std::cout << it << ' ';
 
-    std::cout << "\nFinishing program..." << std::endl;
 
     std::cout << "******* TEST vector::vector(iterator, size_type) *******\n";
     const kt::vector<int> vec_copy(vec6.begin() + 5, 5);
@@ -206,6 +205,23 @@ int main(int, char**)
         ptrs.push_back(std::make_unique<double>(4.5 * 3.0 * i));
 #endif
 
+    std::cout << "\n******* TEST EMPLACE_BACK ********\n";
+    kt::vector<Resource> stuff{};
+
+    stuff.emplace_back();
+    stuff.emplace_back();
+    stuff.emplace_back();
+    stuff.emplace_back();
+
+    for (const auto& it : stuff)
+        std::cout << it.m_id << ' ';
+
+
+
+
+
+
+    std::cout << "\nFinishing program..." << std::endl;
     std::cout << std::endl;
     return 0;
 }
