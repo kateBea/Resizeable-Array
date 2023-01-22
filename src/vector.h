@@ -27,6 +27,7 @@ public:
     using reference_type        = T&;
     using pointer_type          = T*;
     using const_reference_type  = const T&;
+    using c_string_type         = const char*;
 
     class iterator
     {
@@ -541,6 +542,7 @@ public:
     {
         if (count < this->m_count)
         {
+            // if we have more than count elements
             std::for_each(this->m_array,
                 this->m_array + count, [](reference_type info) -> void { info.~T(); });
 
@@ -548,6 +550,7 @@ public:
         }
         else
         {
+            // if we have less than count elements
             std::for_each(this->m_array,
                 this->m_array + this->m_count, [](reference_type info) -> void { info.~T(); });
 
@@ -777,7 +780,7 @@ private:
         empty_vector() = default;
         ~empty_vector() = default;
 
-        const char* what() const noexcept override
+        auto what() const noexcept override
         {
             return this->m_exc.data();
         }
