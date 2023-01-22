@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <memory>
 #include <cstring>
+#include <cassert>
 #include <cstdint>
 #include <utility>
 #include <iterator>
@@ -14,7 +15,8 @@
 #include <string_view>
 #include <initializer_list>
 
-#define DEBUG_LOG(log_str)  std::cerr << log_str << '\n'
+#define DEBUG_LOG(log_str) \
+    std::cerr << log_str << '\n'
 
 namespace kt
 {
@@ -393,6 +395,9 @@ public:
     ///
     auto operator[](size_type index) -> reference_type
     {
+#ifdef _DEBUG
+        assert(index < this->m_count && "Attempting to derefenrence out of bounds index element...");
+#endif
         return this->m_array[index];
     }
 
@@ -401,6 +406,9 @@ public:
     ///
     auto operator[](size_type index) const -> const_reference_type
     {
+#ifdef _DEBUG
+        assert(index < this->m_count && "Attempting to derefenrence out of bounds index element...");
+#endif
         return this->m_array[index];
     }
 
