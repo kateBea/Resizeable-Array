@@ -1,7 +1,14 @@
 #ifndef VECTOR_HH
 #define VECTOR_HH
 
-// C++ standard library includes
+// Macros
+#define DEBUG_LOG(log_str) \
+    std::cerr << log_str << '\n'
+
+#define NAMESPACE_KT_BEG namespace kt {
+#define NAMESPACE_KT_END }
+
+// C++ standard library
 #include <new>
 #include <cstdio>
 #include <memory>
@@ -15,11 +22,8 @@
 #include <string_view>
 #include <initializer_list>
 
-#define DEBUG_LOG(log_str) \
-    std::cerr << log_str << '\n'
+NAMESPACE_KT_BEG
 
-namespace kt
-{
 template <typename T>
 class vector
 {
@@ -770,6 +774,7 @@ private:
             return;
         }
 
+        // TODO: pending to change to std::copy, same goes for some constructors
         std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),
             this->m_count * sizeof(value_type));
 
@@ -816,8 +821,20 @@ private:
 
     // CONSTRAINTS:
     // m_capacity >= m_count >= 0
+
+    // DETAILS:
+    // value_type must support the operations for 
+    // copy assignmet or move assigment
+
+    // m_capacity points to the underlying memory buffer owned by 
+    // this vector or its value is nullptr
+
+    // m_capacity is increased by a grow factor to minimise reallocations
+
+    // m_count keeps track of the amount of elements already held
+    // inside the vector
 };
 
-}   // END KT NAMESPACE
+NAMESPACE_KT_END   // END KT NAMESPACE
 
 #endif
