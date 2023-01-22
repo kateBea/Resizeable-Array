@@ -159,6 +159,7 @@ public:
     ///
     /// Default constructor
     ///
+    explicit
     vector()
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
@@ -168,6 +169,7 @@ public:
     ///
     /// Parametrized constructor. Reserve space to hold at least "count" elements
     ///
+    explicit
     vector(size_type count)
         :   m_array{ nullptr }, m_count{ 0 }, m_capacity{ count }
     {
@@ -219,8 +221,7 @@ public:
             if (this->m_array)
             {
                 std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(first.raw()),
-                    new_block_size );
-                //std::copy(first.raw(), last.raw(), this->m_array);
+                    new_block_size);
                 this->m_count = new_block_size / sizeof(value_type);
                 this->m_capacity = new_block_size / sizeof(value_type);
 
@@ -465,21 +466,26 @@ public:
     }
 
     ///
-    /// Reserve a block of memory to hold count elements
+    /// Reserve a block of memory to hold at least count elements
+    /// Has no effect if the container can already hold new_count elements i.e.
+    /// this->capacity() is equal or greater to new_count
     ///
-    auto reserve(size_type count) -> void
+    auto reserve(size_type new_count) -> void
     {
-        // TODO
-
-        // this function can be called at any point and
-        // state of the vector in the program
-
+        if (new_count > this->m_capacity)
+        {
+            this->m_capacity = new_count;
+            reallocate();
+        }
     }
 
     ///
     /// Adjust vector to contain count elements
     ///
-    auto resize(size_type count) -> void;
+    auto resize(size_type count) -> void
+    {
+
+    }
 
     ///
     /// Insert elements at the end
@@ -572,7 +578,7 @@ public:
         {
             reallocate();
 
-            // if reallocate fails, m_size will remain same as m_capacity
+            // if reallocate fails, m_count will remain same as m_capacity
             // preventing from appending new element
             if (this->m_capacity == this->m_count)
             {
@@ -589,7 +595,7 @@ public:
     /// Insert one element at the end of the vector
     /// with support for move semantics
     ///
-    auto push_back(T&& info) -> void
+    auto push_back(value_type&& info) -> void
     {
         // if capacity == count:
         // allocate new block
@@ -609,7 +615,7 @@ public:
         {
             reallocate();
 
-            // if reallocate fails, m_size will remain same as m_capacity
+            // if reallocate fails, m_count will remain same as m_capacity
             // preventing from appending new element
             if (this->m_capacity == this->m_count)
             {
@@ -694,6 +700,37 @@ public:
         return const_iterator{ this->m_array + this->m_count };
     }
 
+    ///
+    /// Returns a reference to the first element of the vector
+    ///
+    auto front() -> reference_type 
+    {
+        return *this->m_array;
+    }
+
+    ///
+    /// Returns a reference to the last element of the vector
+    ///
+    auto back() -> reference_type 
+    {
+        return *(this->m_array + this->m_count - 1);
+    }
+
+    ///
+    /// Returns a reference to the first element of the vector
+    ///
+    auto front() const -> const_reference_type 
+    {
+        return *this->m_array;
+    }
+
+    ///
+    /// Returns a reference to the last element of the vector
+    ///
+    auto back() const -> const_reference_type 
+    {
+        return *(this->m_array + this->m_count - 1);
+    }
 
 private:
     static constexpr size_type grow_factor{ 2 };
