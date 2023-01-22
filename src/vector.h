@@ -76,6 +76,12 @@ public:
             return iterator{ this->p - count };
         }
 
+        auto operator-(iterator other) -> size_type
+        {
+            return this->p > other.p ? 
+                    (this->p - other.p) : (other.p - this->p);
+        }
+
         auto operator!=(const iterator& other) -> bool
         {
             return this->p != other.p;
@@ -138,6 +144,12 @@ public:
         auto operator-(size_type count) const -> const_iterator
         {
             return const_iterator{ this->p - count };
+        }
+
+        auto operator-(const_iterator other) -> size_type
+        {
+            return this->p > other.p ? 
+                    (this->p - other.p) : (other.p - this->p);
         }
 
         auto operator!=(const const_iterator& other) const -> bool
@@ -210,11 +222,12 @@ public:
     /// Parametrized constructor. Initialize this vector with elements
     /// within the ranged given by "first" and "last"
     ///
-    vector(iterator first, iterator last)
+    template<typename InputIterator>
+    vector(InputIterator first, InputIterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
         // represents the amount of bytes between first and last
-        size_type new_block_size{ sizeof(value_type) * std::distance(first.raw(), last.raw()) };
+        size_type new_block_size{ sizeof(value_type) * (last - first) };
 
         if (new_block_size != 0)
         {
@@ -788,7 +801,7 @@ private:
         empty_vector() = default;
         ~empty_vector() = default;
 
-        auto what() const noexcept override
+        auto what() const noexcept -> c_string_type
         {
             return this->m_exc.data();
         }
