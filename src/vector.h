@@ -179,7 +179,7 @@ public:
     /// Default constructor
     ///
     explicit
-    vector()
+    vector() noexcept
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
 
@@ -341,7 +341,7 @@ public:
     ///
     /// Move constructor
     ///
-    vector(vector&& other)
+    vector(vector&& other) noexcept
         :   m_array{ other.m_array }, m_count{ other.m_count }, m_capacity{ other.m_capacity }
     {
         if (other.m_capacity != 0)
@@ -367,7 +367,7 @@ public:
     ///
     /// Assigment operator
     ///
-    vector& operator=(vector&& other)
+    vector& operator=(vector&& other) noexcept
     {
         if (this != &other)
         {
@@ -683,7 +683,7 @@ public:
     ///
     /// Returns an iterator to the beginning of the vector
     ///
-    auto begin() -> iterator
+    auto begin() noexcept -> iterator
     {
         return iterator{ this->m_array };
     }
@@ -691,7 +691,7 @@ public:
     ///
     /// Returns an iterator to the element past of the vector
     ///
-    auto end() -> iterator
+    auto end() noexcept -> iterator
     {
         return iterator{ this->m_array + this->m_count };
     }
@@ -699,7 +699,7 @@ public:
     ///
     /// Returns a constant iterator to the beginning of the vector
     ///
-    auto begin() const -> const_iterator
+    auto begin() const noexcept -> const_iterator
     {
         return const_iterator{ this->m_array };
     }
@@ -707,7 +707,7 @@ public:
     ///
     /// Returns a constant iterator past the last element of the vector
     ///
-    auto end() const -> const_iterator
+    auto end() const noexcept -> const_iterator
     {
         return const_iterator{ this->m_array + this->m_count };
     }
@@ -715,7 +715,7 @@ public:
     ///
     /// Returns a constant iterator to the beginning of the vector
     ///
-    auto cbegin() const -> const_iterator
+    auto cbegin() const noexcept -> const_iterator
     {
         return const_iterator{ this->m_array };
     }
@@ -723,7 +723,7 @@ public:
     ///
     /// Returns a constant iterator past the last element of the vector
     ///
-    auto cend() const -> const_iterator
+    auto cend() const noexcept -> const_iterator
     {
         return const_iterator{ this->m_array + this->m_count };
     }
@@ -731,7 +731,7 @@ public:
     ///
     /// Returns a reference to the first element of the vector
     ///
-    auto front() -> reference_type 
+    auto front() noexcept -> reference_type 
     {
         return *this->m_array;
     }
@@ -739,7 +739,7 @@ public:
     ///
     /// Returns a reference to the last element of the vector
     ///
-    auto back() -> reference_type 
+    auto back() noexcept -> reference_type 
     {
         return *(this->m_array + this->m_count - 1);
     }
@@ -747,7 +747,7 @@ public:
     ///
     /// Returns a reference to the first element of the vector
     ///
-    auto front() const -> const_reference_type 
+    auto front() const noexcept -> const_reference_type 
     {
         return *this->m_array;
     }
@@ -755,7 +755,7 @@ public:
     ///
     /// Returns a reference to the last element of the vector
     ///
-    auto back() const -> const_reference_type 
+    auto back() const noexcept -> const_reference_type 
     {
         return *(this->m_array + this->m_count - 1);
     }
@@ -791,7 +791,7 @@ private:
         out_of_bounds() = default;
         ~out_of_bounds() = default;
 
-        const char* what() const noexcept override
+        auto what() const noexcept -> c_string_type override
         {
             return this->m_exc.data();
         }
@@ -806,7 +806,7 @@ private:
         empty_vector() = default;
         ~empty_vector() = default;
 
-        auto what() const noexcept -> c_string_type
+        auto what() const noexcept -> c_string_type override
         {
             return this->m_exc.data();
         }
