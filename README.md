@@ -1,5 +1,6 @@
 # Simple vector class
 Attempt of implementation of a class to encapsulate dynamically resizeable arrays.
+
 A dynamic resizable array is an array-like data structure that can change its size 
 dynamically at runtime. It starts with a certain initial capacity and grows or 
 shrinks as needed, based on the number of elements may hold.
