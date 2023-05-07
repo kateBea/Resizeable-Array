@@ -49,7 +49,7 @@ int main(int, char**) {
     return 0;
 }
 ```
-
+```shell
 # Building and executing the example
 # Clone repository
 git clone --recursive repo_url
@@ -63,3 +63,4 @@ cmake --build .
 
 # Run application
 ./dinArray
+```
