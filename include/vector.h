@@ -22,6 +22,9 @@
 #include <string_view>
 #include <initializer_list>
 
+#include "iterator.hh"
+#include "cons_iterator.hh"
+
 NAMESPACE_KT_BEG
 
 template <typename T>
@@ -34,146 +37,8 @@ public:
     using pointer_type          = T*;
     using const_reference_type  = const T&;
     using c_string_type         = const char*;
-
-    class iterator
-    {
-    public:
-        explicit iterator(pointer_type ptr) : p{ ptr } { }
-
-        // prefix increment
-        auto operator++() -> iterator
-        {
-            ++p;
-            return *this;
-        }
-
-        // postfix increment
-        auto operator++(int) -> iterator
-        {
-            auto res{ p };
-            ++p;
-            return iterator{ res };
-        }
-
-        // prefix increment
-        auto operator--() -> iterator
-        {
-            --p;
-            return *this;
-        }
-
-        // postfix increment
-        auto operator--(int) -> iterator
-        {
-            auto res{ p };
-            --p;
-            return iterator{ res };
-        }
-
-        auto operator+(size_type count) -> iterator
-        {
-            return iterator{ this->p + count };
-        }
-
-        auto operator-(size_type count) -> iterator
-        {
-            return iterator{ this->p - count };
-        }
-
-        auto operator-(iterator other) -> size_type
-        {
-            return this->p > other.p ? 
-                    (this->p - other.p) : (other.p - this->p);
-        }
-
-        auto operator!=(const iterator& other) -> bool
-        {
-            return this->p != other.p;
-        }
-
-        auto operator==(const iterator& other) -> bool
-        {
-            return this->p == other.p;
-        }
-
-        auto operator*() -> reference_type { return *p; }
-        auto operator->() -> pointer_type { return p; }
-
-        auto raw() const -> pointer_type { return p; }
-
-    private:
-        pointer_type p{};
-    };
-
-    class const_iterator
-    {
-    public:
-        explicit const_iterator(pointer_type ptr) : p{ ptr } { }
-
-        // prefix increment
-        auto operator++() -> const_iterator
-        {
-            ++p;
-            return *this;
-        }
-
-        // postfix increment
-        auto operator++(int) -> const_iterator
-        {
-            auto res{ p };
-            ++p;
-            return const_iterator{ res };
-        }
-
-        // prefix increment
-        auto operator--() -> const_iterator
-        {
-            --p;
-            return *this;
-        }
-
-        // postfix increment
-        auto operator--(int) -> const_iterator
-        {
-            auto res{ p };
-            --p;
-            return const_iterator{ res };
-        }
-
-        auto operator+(size_type count) const -> const_iterator
-        {
-            return const_iterator{ this->p + count };
-        }
-
-        auto operator-(size_type count) const -> const_iterator
-        {
-            return const_iterator{ this->p - count };
-        }
-
-        auto operator-(const_iterator other) -> size_type
-        {
-            return this->p > other.p ? 
-                    (this->p - other.p) : (other.p - this->p);
-        }
-
-        auto operator!=(const const_iterator& other) const -> bool
-        {
-            return this->p != other.p;
-        }
-
-        auto operator==(const const_iterator& other) const -> bool
-        {
-            return this->p == other.p;
-        }
-
-        auto operator*() const -> const_reference_type { return *p; }
-        auto operator->() const -> pointer_type { return p; }
-
-        auto raw() const -> pointer_type { return p; }
-
-    private:
-        pointer_type p{};
-    };
+    using iterator_t              = iterator<value_type>;
+    using const_iterator_t        = const_iterator<value_type>;
 
     ///
     /// Default constructor
@@ -257,7 +122,7 @@ public:
     /// Parametrized constructor. Initialize this vector with "count"
     /// elements starting from "begin"
     ///
-    vector(iterator first, size_type count)
+    vector(iterator_t first, size_type count)
         :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
     {
         // TODO: still needs testing
@@ -683,7 +548,7 @@ public:
     ///
     /// Returns an iterator to the beginning of the vector
     ///
-    auto begin() noexcept -> iterator
+    auto begin() noexcept -> iterator_t
     {
         return iterator{ this->m_array };
     }
@@ -691,7 +556,7 @@ public:
     ///
     /// Returns an iterator to the element past of the vector
     ///
-    auto end() noexcept -> iterator
+    auto end() noexcept -> iterator_t
     {
         return iterator{ this->m_array + this->m_count };
     }
@@ -699,7 +564,7 @@ public:
     ///
     /// Returns a constant iterator to the beginning of the vector
     ///
-    auto begin() const noexcept -> const_iterator
+    auto begin() const noexcept -> const_iterator_t
     {
         return const_iterator{ this->m_array };
     }
@@ -707,7 +572,7 @@ public:
     ///
     /// Returns a constant iterator past the last element of the vector
     ///
-    auto end() const noexcept -> const_iterator
+    auto end() const noexcept -> const_iterator_t
     {
         return const_iterator{ this->m_array + this->m_count };
     }
@@ -715,7 +580,7 @@ public:
     ///
     /// Returns a constant iterator to the beginning of the vector
     ///
-    auto cbegin() const noexcept -> const_iterator
+    auto cbegin() const noexcept -> const_iterator_t
     {
         return const_iterator{ this->m_array };
     }
@@ -723,7 +588,7 @@ public:
     ///
     /// Returns a constant iterator past the last element of the vector
     ///
-    auto cend() const noexcept -> const_iterator
+    auto cend() const noexcept -> const_iterator_t
     {
         return const_iterator{ this->m_array + this->m_count };
     }
