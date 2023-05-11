@@ -25,8 +25,7 @@ Below an example of usage:
 
 int main(int, char**) {
     kt::vector<int> my_vector;
-
-    // Adding elements to the vector
+    
     my_vector.push_back(10);
     my_vector.push_back(20);
     my_vector.push_back(30);
