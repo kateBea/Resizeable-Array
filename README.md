@@ -19,9 +19,9 @@ is aimed to support any type that is both copy assigneable and copy constructibl
 
 Below an example of usage:
 
-```cc
+```cpp
 #include <iostream>
-#include <vector>
+#include <vector.hh>
 
 int main(int, char**) {
     kt::vector<int> my_vector;

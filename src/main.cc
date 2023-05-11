@@ -1,4 +1,4 @@
-#include "../include/vector.h"
+#include "../include/vector.hh"
 #include <iostream>
 #include <memory>
 
@@ -222,7 +222,7 @@ int main(int, char**)
     for (auto it{ stuff.begin() }; it != stuff.end(); ++it)
         std::cout << it->m_id << std::endl;
 
-    for (kt::vector<Resource>::const_iterator_t it{ stuff.cbegin() }; it != stuff.cend(); ++it)
+    for (kt::vector<Resource>::const_iterator_type it{stuff.cbegin() }; it != stuff.cend(); ++it)
         std::cout << it->m_id << std::endl;
 
     std::cout << std::endl;

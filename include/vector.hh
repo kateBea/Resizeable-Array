@@ -1,27 +1,7 @@
 #ifndef VECTOR_HH
 #define VECTOR_HH
 
-// Macros
-#define DEBUG_LOG(log_str) \
-    std::cerr << log_str << '\n'
-
-#define NAMESPACE_KT_BEG namespace kt {
-#define NAMESPACE_KT_END }
-
-// C++ standard library
-#include <new>
-#include <cstdio>
-#include <memory>
-#include <cstring>
-#include <cassert>
-#include <cstdint>
-#include <utility>
-#include <iterator>
-#include <algorithm>
-#include <exception>
-#include <string_view>
-#include <initializer_list>
-
+#include "common.hh"
 #include "iterator.hh"
 #include "cons_iterator.hh"
 
@@ -37,34 +17,41 @@ public:
     using pointer_type          = T*;
     using const_reference_type  = const T&;
     using c_string_type         = const char*;
-    using iterator_t              = iterator<value_type>;
-    using const_iterator_t        = const_iterator<value_type>;
+    using iterator_type         = iterator<value_type>;
+    using const_iterator_type   = const_iterator<value_type>;
 
-    ///
-    /// Default constructor
-    ///
+    /**
+     * Default constructs this vector with initial size of 0
+     * and initial capacity of 0
+     * */
     explicit
     vector() noexcept
         :   m_array{ nullptr }, m_count{}, m_capacity{}
-    {
+    {}
 
-    }
-
-    ///
-    /// Parametrized constructor. Reserve space to hold at least "count" elements
-    ///
+    /**
+     * Initializes this vector with <code>count</code> copies of
+     * the value <code>value</code>
+     */
     explicit
-    vector(size_type count)
-        :   m_array{ nullptr }, m_count{ 0 }, m_capacity{ count }
+    vector(size_type count, const value_type& value = value_type())
+        :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
     {
-        if (count != 0)
+        if (m_count != 0) {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * count, std::nothrow));
 
+            // if we managed to allocate space we fill the array
+            // with the provided value
+            if (this->m_array != nullptr)
+                std::uninitialized_fill(this->m_array, this->m_array + m_count, value);
+        }
+#if _DEBUG
         if (not this->m_array)
         {
             std::printf("could not allocate block of memory...");
             this->m_capacity = 0;
         }
+#endif
     }
 
     ///
@@ -122,7 +109,7 @@ public:
     /// Parametrized constructor. Initialize this vector with "count"
     /// elements starting from "begin"
     ///
-    vector(iterator_t first, size_type count)
+    vector(iterator_type first, size_type count)
         :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
     {
         // TODO: still needs testing
@@ -248,17 +235,19 @@ public:
         return *this;
     }
 
-    ///
-    /// Amount of elements in the vector
-    ///
+    /**
+     * Returns the total count of elements of this vector
+     * @return total elements contained within this vector
+     * */
     auto size() const -> size_type
     {
         return this->m_count;
     }
 
-    ///
-    /// Returns the size of the underlying block of memory held by this vector
-    ///
+    /**
+     * Returns the number of elements this vector has allocated space for
+     * @return capacity of this vector
+     * */
     auto capacity() const -> size_type
     {
         return this->m_capacity;
@@ -548,7 +537,7 @@ public:
     ///
     /// Returns an iterator to the beginning of the vector
     ///
-    auto begin() noexcept -> iterator_t
+    auto begin() noexcept -> iterator_type
     {
         return iterator{ this->m_array };
     }
@@ -556,7 +545,7 @@ public:
     ///
     /// Returns an iterator to the element past of the vector
     ///
-    auto end() noexcept -> iterator_t
+    auto end() noexcept -> iterator_type
     {
         return iterator{ this->m_array + this->m_count };
     }
@@ -564,7 +553,7 @@ public:
     ///
     /// Returns a constant iterator to the beginning of the vector
     ///
-    auto begin() const noexcept -> const_iterator_t
+    auto begin() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array };
     }
@@ -572,7 +561,7 @@ public:
     ///
     /// Returns a constant iterator past the last element of the vector
     ///
-    auto end() const noexcept -> const_iterator_t
+    auto end() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array + this->m_count };
     }
@@ -580,7 +569,7 @@ public:
     ///
     /// Returns a constant iterator to the beginning of the vector
     ///
-    auto cbegin() const noexcept -> const_iterator_t
+    auto cbegin() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array };
     }
@@ -588,7 +577,7 @@ public:
     ///
     /// Returns a constant iterator past the last element of the vector
     ///
-    auto cend() const noexcept -> const_iterator_t
+    auto cend() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array + this->m_count };
     }
@@ -680,9 +669,9 @@ private:
         std::string_view m_exc{ "[empty_vector]: vector has no elements\n" };
     };
 
-    pointer_type m_array;
-    size_type m_count;
-    size_type m_capacity;
+    pointer_type    m_array;
+    size_type       m_count;
+    size_type       m_capacity;
 
     // CONSTRAINTS:
     // m_capacity >= m_count >= 0

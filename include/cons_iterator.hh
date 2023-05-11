@@ -11,12 +11,9 @@ template<typename T>
 class const_iterator
 {
 public:
-    using value_type            = T;
     using size_type             = std::size_t;
-    using reference_type        = T&;
     using pointer_type          = T*;
     using const_reference_type  = const T&;
-    using c_string_type         = const char*;
 
     explicit const_iterator(pointer_type ptr) : p{ ptr } { }
 
