@@ -2,14 +2,17 @@
 #define ITERATOR_HH
 
 #include <cstdint>
+#include <cstddef>
 
 template<typename T>
 class iterator
 {
 public:
-    using value_type            = T;
+    using iterator_category = std::input_iterator_tag;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer_type = T*;
     using size_type             = std::size_t;
-    using pointer_type          = T*;
     using reference_type        = T&;
 
     explicit iterator(pointer_type ptr) : p{ ptr } { }

@@ -17,8 +17,8 @@ public:
     using pointer_type          = T*;
     using const_reference_type  = const T&;
     using c_string_type         = const char*;
-    using iterator_type         = iterator<value_type>;
-    using const_iterator_type   = const_iterator<value_type>;
+    using iterator_type         = iterator<T>;
+    using const_iterator_type   = const_iterator<T>;
 
     /**
      * Default constructs this vector with initial size of 0
@@ -42,8 +42,7 @@ public:
         if (m_count != 0) {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * count, std::nothrow));
 
-            // if we managed to allocate space we fill the array
-            // with the provided value
+            // if we managed to allocate space we fill the array with the provided value
             if (this->m_array != nullptr)
                 std::uninitialized_fill(this->m_array, this->m_array + m_count, value);
         }
@@ -102,7 +101,9 @@ public:
 
             if (this->m_array)
             {
-                std::uninitialized_copy(first, last, this->m_array);
+                for (auto start{ begin() }; first != last; ++first, ++start)
+                    new (start.raw()) value_type(*first);
+
                 this->m_count = new_block_size / sizeof(value_type);
                 this->m_capacity = new_block_size / sizeof(value_type);
             }
@@ -119,48 +120,57 @@ public:
     /// Parametrized constructor. Initialize this vector with "count"
     /// elements starting from "begin"
     ///
-    vector(iterator_type first, size_type count)
+
+    /**
+     * Initialize this vector with <code>count</code> elements from
+     * range of elements starting at <code>first</code>. If the range contains
+     * less than <code>count</code> elements the behaviour of this method is undefined
+     * @param first starting point of the range of elements
+     * @param count amount of elements to be copied
+     * @tparam InputIterator iterator that allows to read the referenced content
+     * */
+    template<typename InputIterator>
+    vector(InputIterator first, size_type count)
         :   m_array{ nullptr }, m_count{ count }, m_capacity{ count }
     {
-        // TODO: still needs testing
-        if (count != 0)
+        if (m_count != 0)
         {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * count, std::nothrow));
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(first.raw()),
-                    count * sizeof(value_type));
-                // std::copy(first.raw(), first.raw() + count, this->m_array);
+                for (auto start{ begin() }; start != end(); ++first, ++start)
+                    new (start.raw()) value_type(*first);
+
                 this->m_count = count;
                 this->m_capacity = count;
             }
+#ifdef _DEBUG
             else
             {
+
                 std::printf("could not allocate block of memory...");
-                this->m_count = 0;
-                this->m_capacity = 0;
             }
+#endif
         }
     }
 
-    ///
-    /// Copy constructor. Initialize this vector with elements from "other"
-    ///
+    /**
+     * Copies contents from <code>other</code> into this vector
+     * @param other copied from vector
+     * */
     vector(const vector& other)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        if (other.m_count != 0)
+        if (other.size() != 0)
         {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * other.m_count, std::nothrow));
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(other.m_array),
-                    other.m_count * sizeof(value_type));
-                // std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
-                this->m_count = other.m_count;
-                this->m_capacity = other.m_capacity;
+                std::copy(other.begin().raw(), other.end().raw(), this->m_array);
+                this->m_count = other.size();
+                this->m_capacity = other.capacity();
             }
             else
             {
@@ -249,6 +259,7 @@ public:
      * Returns the total count of elements of this vector
      * @return total elements contained within this vector
      * */
+     [[nodiscard]]
     auto size() const -> size_type
     {
         return this->m_count;
@@ -258,22 +269,27 @@ public:
      * Returns the number of elements this vector has allocated space for
      * @return capacity of this vector
      * */
+    [[nodiscard]]
     auto capacity() const -> size_type
     {
         return this->m_capacity;
     }
 
-    ///
-    /// Return true if this vector has no elements, fase otherwise
-    ///
+    /**
+     * Returns <code>true</code> if this vector has no elements,
+     * returns <code>false</code> otherwise
+     * */
+    [[nodiscard]]
     auto empty() const -> bool
     {
         return this->m_count == 0;
     }
 
-    ///
-    /// Returns reference to element at postion "index"
-    ///
+    /**
+     * Returns a reference to the first element of this vector
+     * @return reference to first element
+     * */
+    [[nodiscard]]
     auto operator[](size_type index) -> reference_type
     {
 #ifdef _DEBUG
@@ -549,7 +565,7 @@ public:
      [[nodiscard]]
     constexpr auto begin() noexcept -> iterator_type
     {
-        return iterator{ this->m_array };
+        return iterator_type{ this->m_array };
     }
 
     /**
@@ -559,7 +575,7 @@ public:
     [[nodiscard]]
     constexpr auto end() noexcept -> iterator_type
     {
-        return iterator{ this->m_array + this->m_count };
+        return iterator_type{ this->m_array + this->m_count };
     }
 
     /**
@@ -569,7 +585,7 @@ public:
     [[nodiscard]]
     constexpr auto begin() const noexcept -> const_iterator_type
     {
-        return const_iterator{ this->m_array };
+        return const_iterator_type{ this->m_array };
     }
 
     /**
@@ -579,7 +595,7 @@ public:
     [[nodiscard]]
     constexpr auto end() const noexcept -> const_iterator_type
     {
-        return const_iterator{ this->m_array + this->m_count };
+        return const_iterator_type{ this->m_array + this->m_count };
     }
 
     /**
@@ -589,7 +605,7 @@ public:
     [[nodiscard]]
     constexpr auto cbegin() const noexcept -> const_iterator_type
     {
-        return const_iterator{ this->m_array };
+        return const_iterator_type{ this->m_array };
     }
 
     /**
@@ -599,7 +615,7 @@ public:
     [[nodiscard]]
     constexpr auto cend() const noexcept -> const_iterator_type
     {
-        return const_iterator{ this->m_array + this->m_count };
+        return const_iterator_type{ this->m_array + this->m_count };
     }
 
     /**
