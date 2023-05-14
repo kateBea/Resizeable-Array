@@ -1,9 +1,5 @@
-//
-// Created by kate on 5/7/23.
-//
-
-#ifndef RESIZEABLE_ARRAY_CONS_ITERATOR_HH
-#define RESIZEABLE_ARRAY_CONS_ITERATOR_HH
+#ifndef CONST_ITERATOR_HH
+#define CONST_ITERATOR_HH
 
 #include <cstdint>
 
@@ -15,7 +11,9 @@ public:
     using pointer_type          = T*;
     using const_reference_type  = const T&;
 
-    explicit const_iterator(pointer_type ptr) : p{ ptr } { }
+    explicit const_iterator(pointer_type ptr)
+        :   p{ ptr }
+    {}
 
     // prefix increment
     auto operator++() -> const_iterator
@@ -82,4 +80,4 @@ private:
     pointer_type p{};
 };
 
-#endif //RESIZEABLE_ARRAY_CONS_ITERATOR_HH
+#endif // CONST_ITERATOR_HH

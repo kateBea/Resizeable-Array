@@ -3,7 +3,7 @@
 
 #include "common.hh"
 #include "iterator.hh"
-#include "cons_iterator.hh"
+#include "const_iterator.hh"
 
 NAMESPACE_KT_BEG
 
@@ -32,6 +32,8 @@ public:
     /**
      * Initializes this vector with <code>count</code> copies of
      * the value <code>value</code>
+     * @param count amount of copies to be made
+     * @param value initial value for ech copy
      */
     explicit
     vector(size_type count, const value_type& value = value_type())
@@ -45,33 +47,32 @@ public:
             if (this->m_array != nullptr)
                 std::uninitialized_fill(this->m_array, this->m_array + m_count, value);
         }
-#if _DEBUG
         if (not this->m_array)
         {
+#if _DEBUG
             std::printf("could not allocate block of memory...");
+#endif
             this->m_capacity = 0;
         }
-#endif
     }
 
-    ///
-    /// Parametrized constructor. Initializes vector
-    /// with the elements from "content"
-    ///
+    /**
+     * Constructs and initializes this vector with the elements with in the
+     * range of the <b>std::initializer_list</b>
+     * @param content range of elements to initialize this vector with
+     * */
     vector(std::initializer_list<T>&& content)
-        :   m_array{ static_cast<pointer_type>(::operator new(sizeof(value_type) * content.size(), std::nothrow)) },
-            m_count{ content.size() }, m_capacity{ content.size() }
+        :   m_array{ static_cast<pointer_type>(::operator new(sizeof(value_type) * content.size(), std::nothrow)) }
+        ,   m_count{ content.size() }, m_capacity{ content.size() }
     {
         if (this->m_array)
-            std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(content.begin()),
-                content.size() * sizeof(value_type));
-            // std::copy(content.begin(), content.end(), this->m_array);
+            std::copy(content.begin(), content.end(), this->m_array);
+#if _DEBUG
         else
         {
             std::printf("could not allocate block of memory...");
-            this->m_count = 0;
-            this->m_capacity = 0;
         }
+#endif
     }
 
     ///
@@ -506,78 +507,82 @@ public:
             }
 
             new(&this->m_array[this->m_count]) value_type(std::move(info));
-            this->m_count += 1;
+            ++(this->m_count);
         }
     }
 
-    ///
-    /// Remove the last element from the vector
-    ///
+    /**
+     * Remove the last element of this vector
+     * */
     auto pop_back() -> void
     {
         if (this->m_count != 0)
         {
             this->m_array[this->m_count - 1].~T();
-            this->m_count -= 1;
+            --(this->m_count);
         }
 
     }
 
-    ///
-    /// Remove all elements from the vector
-    ///
+    /**
+     * Remove all the elements from this vector
+     * */
     auto clear() -> void
     {
-        std::for_each(this->m_array,
-            this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
-
+        std::for_each(this->m_array, this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
         this->m_count = 0;
     }
 
-    ///
-    /// Returns an iterator to the beginning of the vector
-    ///
-    auto begin() noexcept -> iterator_type
+    /**
+     * Returns an iterator to the beginning of the vector
+     * @return access to the elements at the beginning
+     * */
+    constexpr auto begin() noexcept -> iterator_type
     {
         return iterator{ this->m_array };
     }
 
-    ///
-    /// Returns an iterator to the element past of the vector
-    ///
-    auto end() noexcept -> iterator_type
+    /**
+     * Returns an iterator past the last element of the vector
+     * @return access to the element past the end of this vector
+     * */
+    constexpr auto end() noexcept -> iterator_type
     {
         return iterator{ this->m_array + this->m_count };
     }
 
-    ///
-    /// Returns a constant iterator to the beginning of the vector
-    ///
-    auto begin() const noexcept -> const_iterator_type
+    /**
+     * Returns a constant iterator to the beginning of the vector
+     * @return read-only access to the elements at the beginning
+     * */
+    constexpr auto begin() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array };
     }
 
-    ///
-    /// Returns a constant iterator past the last element of the vector
-    ///
-    auto end() const noexcept -> const_iterator_type
+    /**
+     * Returns a constant iterator past the last element of the vector
+     * @return read-only access to the element past the end of this vector
+     * */
+    constexpr auto end() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array + this->m_count };
     }
 
-    ///
-    /// Returns a constant iterator to the beginning of the vector
-    ///
-    auto cbegin() const noexcept -> const_iterator_type
+    /**
+     * Returns a constant iterator to the beginning of the vector
+     * @return read-only access to the elements at the beginning
+     * */
+    constexpr auto cbegin() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array };
     }
 
-    ///
-    /// Returns a constant iterator past the last element of the vector
-    ///
-    auto cend() const noexcept -> const_iterator_type
+    /**
+     * Returns a constant iterator past the last element of the vector
+     * @return read-only access to the element past the end of this vector
+     * */
+    constexpr auto cend() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array + this->m_count };
     }

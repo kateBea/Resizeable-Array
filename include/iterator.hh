@@ -1,9 +1,5 @@
-//
-// Created by kate on 5/7/23.
-//
-
-#ifndef RESIZEABLE_ARRAY_ITERATOR_HH
-#define RESIZEABLE_ARRAY_ITERATOR_HH
+#ifndef ITERATOR_HH
+#define ITERATOR_HH
 
 #include <cstdint>
 
@@ -82,4 +78,4 @@ private:
     pointer_type p{};
 };
 
-#endif //RESIZEABLE_ARRAY_ITERATOR_HH
+#endif // ITERATOR_HH
