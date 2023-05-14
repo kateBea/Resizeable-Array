@@ -62,5 +62,5 @@ cmake ..
 cmake --build .
 
 # Run application
-./dinArray
+./ctorTest1
 ```

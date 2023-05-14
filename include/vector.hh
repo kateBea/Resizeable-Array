@@ -79,6 +79,15 @@ public:
     /// Parametrized constructor. Initialize this vector with elements
     /// within the ranged given by "first" and "last"
     ///
+
+    /**
+     * Initialize this vector with the elements from the range within
+     * first and last (exclusive) iterators, i.e. copies [first, last)
+     * to this vector
+     * @param first first elements from the range of elements to be copied
+     * @param last last element from the range (not copied)
+     * @tparam InputIterator iterator that allows to read the referenced content
+     * */
     template<typename InputIterator>
     vector(InputIterator first, InputIterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
@@ -93,16 +102,16 @@ public:
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(first.raw()),
-                    new_block_size);
+                std::uninitialized_copy(first, last, this->m_array);
                 this->m_count = new_block_size / sizeof(value_type);
                 this->m_capacity = new_block_size / sizeof(value_type);
-
             }
+#ifdef _DEBUG
             else
             {
                 std::printf("could not allocate block of memory...");
             }
+#endif
         }
     }
 
@@ -537,6 +546,7 @@ public:
      * Returns an iterator to the beginning of the vector
      * @return access to the elements at the beginning
      * */
+     [[nodiscard]]
     constexpr auto begin() noexcept -> iterator_type
     {
         return iterator{ this->m_array };
@@ -546,6 +556,7 @@ public:
      * Returns an iterator past the last element of the vector
      * @return access to the element past the end of this vector
      * */
+    [[nodiscard]]
     constexpr auto end() noexcept -> iterator_type
     {
         return iterator{ this->m_array + this->m_count };
@@ -555,6 +566,7 @@ public:
      * Returns a constant iterator to the beginning of the vector
      * @return read-only access to the elements at the beginning
      * */
+    [[nodiscard]]
     constexpr auto begin() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array };
@@ -564,6 +576,7 @@ public:
      * Returns a constant iterator past the last element of the vector
      * @return read-only access to the element past the end of this vector
      * */
+    [[nodiscard]]
     constexpr auto end() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array + this->m_count };
@@ -573,6 +586,7 @@ public:
      * Returns a constant iterator to the beginning of the vector
      * @return read-only access to the elements at the beginning
      * */
+    [[nodiscard]]
     constexpr auto cbegin() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array };
@@ -582,15 +596,18 @@ public:
      * Returns a constant iterator past the last element of the vector
      * @return read-only access to the element past the end of this vector
      * */
+    [[nodiscard]]
     constexpr auto cend() const noexcept -> const_iterator_type
     {
         return const_iterator{ this->m_array + this->m_count };
     }
 
-    ///
-    /// Returns a reference to the first element of the vector
-    ///
-    auto front() noexcept -> reference_type 
+    /**
+     * Returns a reference to the first element of this vector
+     * @return front element
+     * */
+    [[nodiscard]]
+    auto front() noexcept -> reference_type
     {
         return *this->m_array;
     }

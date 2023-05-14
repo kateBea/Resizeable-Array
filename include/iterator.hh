@@ -7,6 +7,7 @@ template<typename T>
 class iterator
 {
 public:
+    using value_type            = T;
     using size_type             = std::size_t;
     using pointer_type          = T*;
     using reference_type        = T&;

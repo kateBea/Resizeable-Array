@@ -14,6 +14,7 @@
 #include <exception>
 #include <string_view>
 #include <initializer_list>
+#include <iterator>
 
 #define NAMESPACE_KT_BEG namespace kt {
 #define NAMESPACE_KT_END }
