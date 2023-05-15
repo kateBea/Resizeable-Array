@@ -3,7 +3,6 @@
 
 // C++ standard library
 #include <new>
-#include <cstdio>
 #include <memory>
 #include <cstring>
 #include <cassert>
@@ -15,6 +14,11 @@
 #include <string_view>
 #include <initializer_list>
 #include <iterator>
+
+// Headers only used for debug purposes
+#ifdef _DEBUG
+    #include <cstdio>
+#endif
 
 #define NAMESPACE_KT_BEG namespace kt {
 #define NAMESPACE_KT_END }

@@ -48,7 +48,7 @@ public:
         }
         if (not this->m_array)
         {
-#if _DEBUG
+#ifdef _DEBUG
             std::printf("could not allocate block of memory...");
 #endif
             this->m_capacity = 0;
@@ -66,7 +66,7 @@ public:
     {
         if (this->m_array)
             std::uninitialized_copy(content.begin(), content.end(), this->m_array);
-#if _DEBUG
+#ifdef _DEBUG
         else
         {
             std::printf("could not allocate block of memory...");
@@ -167,12 +167,12 @@ public:
                 this->m_count = other.size();
                 this->m_capacity = other.capacity();
             }
+#ifdef _DEBUG
             else
             {
                 std::printf("could not allocate block of memory...");
-                this->m_count = 0;
-                this->m_capacity = 0;
             }
+#endif
         }
     }
 
@@ -205,13 +205,16 @@ public:
         return *this;
     }
 
-    ///
-    /// Move constructor
-    ///
+    /**
+     * Moves the contents of the <code>other</code> vector
+     * into this vector. After this operation <code>other</code> is put
+     * into an invalid state
+     * @param other moved from vector
+     * */
     vector(vector&& other) noexcept
-        :   m_array{ other.m_array }, m_count{ other.m_count }, m_capacity{ other.m_capacity }
+        :   m_array{ other.m_array }, m_count{ other.size() }, m_capacity{ other.capacity() }
     {
-        if (other.m_capacity != 0)
+        if (other.capacity != 0)
         {
             other.m_array = nullptr;
             other.m_count = 0;
@@ -219,28 +222,19 @@ public:
         }
     }
 
-    ///
-    /// Destructor
-    ///
-    ~vector()
-    {
-        // cleanup
-        for (size_type index{}; index < m_count; ++index)
-            this->m_array[index].~T();
-
-        ::operator delete(this->m_array);
-    }
-
-    ///
-    /// Assigment operator
-    ///
+    /**
+     * Moves the contents of the <code>other</code> vector
+     * into this vector. After this operation <code>other</code> is put
+     * into an invalid state
+     * @param other moved from vector
+     * */
     vector& operator=(vector&& other) noexcept
     {
         if (this != &other)
         {
             this->m_array = other.m_array;
-            this->m_count = other.m_count;
-            this->m_capacity = other.m_capacity;
+            this->m_count = other.size();
+            this->m_capacity = other.capacity();
 
             other.m_array = nullptr;
             other.m_count = 0;
@@ -248,6 +242,28 @@ public:
         }
 
         return *this;
+    }
+
+    /**
+     * Returns a pointer to the block holding the underlying buffer of data
+     * @return pointer to the elements
+     * */
+    constexpr auto data() -> pointer_type
+    {
+        return m_array;
+    }
+
+    /**
+     * Calls the destructor for all the contained elements
+     * in this vector and frees the underlying buffer of memory
+     * */
+    ~vector()
+    {
+        // pre clean-up
+        for (size_type index{}; index < m_count; ++index)
+            this->m_array[index].~T();
+
+        ::operator delete(this->m_array);
     }
 
     /**
@@ -277,7 +293,7 @@ public:
     [[nodiscard]]
     auto empty() const -> bool
     {
-        return this->m_count == 0;
+        return size() == 0;
     }
 
     /**
@@ -290,18 +306,24 @@ public:
 #ifdef _DEBUG
         assert(index < this->m_count && "Attempting to derefenrence out of bounds index element...");
 #endif
-        return this->m_array[index];
+        return (*this)[index];
     }
 
     ///
     /// Returns constant reference to element at postion "index"
     ///
+
+    /**
+     * Returns a constant reference to the element at index <code>index</code>
+     * @param index index of the element to be returned
+     * @return reference to the element at the given index
+     * */
     auto operator[](size_type index) const -> const_reference_type
     {
 #ifdef _DEBUG
         assert(index < this->m_count && "Attempting to derefenrence out of bounds index element...");
 #endif
-        return this->m_array[index];
+        return (*this)[index];
     }
 
     ///
@@ -309,61 +331,39 @@ public:
     /// exception if index is not within the range of valid elements
     /// or "empty_vector" if the vector has no elements
     ///
+
+    /**
+     * Return reference to element at position <code>index</code>
+     * @param index index of the element to be returned
+     * @return reference to the element at the given index
+     * @throws std::runtime_error if this vector is empty or the index is out of bounds
+     * */
     auto at(size_type index) -> reference_type
     {
-        try
-        {
-            if (this->m_count == 0)
-                throw empty_vector{};
-            if (not (index < this->m_count))
-                throw out_of_bounds{};
+        if (size() == 0)
+            throw std::runtime_error("This vector has no elements");
 
-        }
-        catch (const out_of_bounds& oob)
-        {
-            std::printf("%s", oob.what());
-        }
-        catch (const empty_vector& ema)
-        {
-            std::printf("%s", ema.what());
-        }
-        catch(...)
-        {
-            std::printf("Other exceptions thrown");
-        }
+        if (index >= size())
+            throw std::out_of_range("Attempting to access an element out of range");
 
-        return this->m_array[index];
+        return (*this)[index];
     }
 
-    ///
-    /// Return constant reference to element at postion "index" throws "out_of_bounds"
-    /// exception if index is not within the range of valid elements or "empty_vector"
-    /// if the vector has no elements
-    ///
+    /**
+     * Return constant reference to element at position <code>index</code>
+     * @param index index of the element to be returned
+     * @return constant reference to the element at the given index
+     * @throws std::runtime_error if this vector is empty or the index is out of bounds
+     * */
     auto at(size_type index) const -> const_reference_type
     {
-        try
-        {
-            if (this->m_count == 0)
-                throw empty_vector{};
-            if (not (index < this->m_count))
-                throw out_of_bounds{};
+        if (size() == 0)
+            throw std::runtime_error("This vector has no elements");
 
-        }
-        catch (const out_of_bounds& oob)
-        {
-            std::printf("%s", oob.what());
-        }
-        catch (const empty_vector& ema)
-        {
-             std::printf("%s", ema.what());
-        }
-        catch(...)
-        {
-            std::printf("Other exceptions thrown");
-        }
+        if (index >= size())
+            throw std::out_of_range("Attempting to access an element out of range");
 
-        return this->m_array[index];
+        return (*this)[index];
     }
 
     ///
@@ -373,7 +373,12 @@ public:
     ///
     auto reserve(size_type new_count) -> void
     {
-        if (new_count > this->m_capacity)
+        // TODO: how should this function behave when theres elements
+        // TODO: how should this function behave when theres no elements
+
+        // TODO: how should this function behave when capacity is 0
+        // TODO: how should this function behave when capacity is is not 0
+        if (new_count > capacity())
         {
             this->m_capacity = new_count;
             reallocate();
@@ -388,16 +393,19 @@ public:
 
     }
 
-    ///
-    /// Insert elements at the end
-    ///
+    /**
+     * Construct element in place, in this case, right
+     * at the end of this vector. This function takes the necessary
+     * arguments to construct a new object of the type held by this vector
+     * @param args arguments to construct the new object
+     * @tparam types of the parameters of this function
+     * */
     template <typename... Args>
     auto emplace_back(Args&&... args) -> void
     {
-        if (this->m_count == this->m_capacity)
+        if (size() == capacity())
             reallocate();
 
-        // construct in place
         new(&this->m_array[this->m_count++]) value_type(std::forward<Args>(args)...);
     }
 
@@ -407,7 +415,7 @@ public:
     ///
     auto append(const vector& other) -> void
     {
-        if (not other.empty())
+        if (!other.empty())
         {
             pointer_type new_block{ static_cast<pointer_type>
                 (::operator new(sizeof(value_type) * (this->m_count + other.m_count), std::nothrow)) };
