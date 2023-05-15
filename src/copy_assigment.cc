@@ -23,8 +23,7 @@ int get_random_integer() {
 
 int main(int, char**) {
     kt::vector<std::shared_ptr<Resource>> items{};
-    kt::vector<std::shared_ptr<Resource>> other_items{ std::make_shared<Resource>(11)};
-
+    kt::vector<std::shared_ptr<Resource>> other_items{ std::make_shared<Resource>(11) };
     items.push_back(std::make_shared<Resource>(::get_random_integer()));
     items.push_back(std::make_shared<Resource>(::get_random_integer()));
     items.push_back(std::make_shared<Resource>(::get_random_integer()));

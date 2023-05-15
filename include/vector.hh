@@ -679,55 +679,21 @@ private:
         this->m_capacity = new_block_count;
 
     }
-
-    class out_of_bounds : public std::exception
-    {
-    public:
-        out_of_bounds() = default;
-        ~out_of_bounds() = default;
-
-        auto what() const noexcept -> c_string_type override
-        {
-            return this->m_exc.data();
-        }
-
-    private:
-        std::string_view m_exc{ "[out_of_bounds]: Index out of bounds\n" };
-    };
-
-    class empty_vector : public std::exception
-    {
-    public:
-        empty_vector() = default;
-        ~empty_vector() = default;
-
-        auto what() const noexcept -> c_string_type override
-        {
-            return this->m_exc.data();
-        }
-
-    private:
-        std::string_view m_exc{ "[empty_vector]: vector has no elements\n" };
-    };
-
+    
     pointer_type    m_array;
     size_type       m_count;
     size_type       m_capacity;
 
-    // CONSTRAINTS:
-    // m_capacity >= m_count >= 0
-
-    // DETAILS:
-    // value_type must support the operations for 
-    // copy assignmet or move assigment
-
-    // m_capacity points to the underlying memory buffer owned by 
-    // this vector or its value is nullptr
-
-    // m_capacity is increased by a grow factor to minimise reallocations
-
-    // m_count keeps track of the amount of elements already held
-    // inside the vector
+    /**
+     * <h3>CONSTRAINTS: m_capacity >= m_count >= 0</h3>
+     *
+     * <h3>SOME DETAILS:</h3>
+     * <p><code>value_type</code> must support the operations of <strong>copy assignment/copy construction or move assigment/move construction</strong></p>
+     *
+     * <p><code>m_array</code> points to the underlying memory buffer owned by this vector or its value is nullptr</br></p>
+     * <p><code>m_capacity</code> is increased by a growth factor to minimise the number of call to reallocate()</br></p>
+     * <p><code>m_count</code> keeps track of the amount of valid elements in this vector inside the vector</br></p>
+     * */
 };
 
 NAMESPACE_KT_END   // END KT NAMESPACE
