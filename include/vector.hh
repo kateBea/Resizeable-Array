@@ -60,12 +60,12 @@ public:
      * range of the <b>std::initializer_list</b>
      * @param content range of elements to initialize this vector with
      * */
-    vector(std::initializer_list<T>&& content)
+    vector(std::initializer_list<value_type>&& content)
         :   m_array{ static_cast<pointer_type>(::operator new(sizeof(value_type) * content.size(), std::nothrow)) }
         ,   m_count{ content.size() }, m_capacity{ content.size() }
     {
         if (this->m_array)
-            std::copy(content.begin(), content.end(), this->m_array);
+            std::uninitialized_copy(content.begin(), content.end(), this->m_array);
 #if _DEBUG
         else
         {
@@ -73,11 +73,6 @@ public:
         }
 #endif
     }
-
-    ///
-    /// Parametrized constructor. Initialize this vector with elements
-    /// within the ranged given by "first" and "last"
-    ///
 
     /**
      * Initialize this vector with the elements from the range within
@@ -181,16 +176,16 @@ public:
         }
     }
 
-    ///
-    /// Assigment operator. Deep copy of "other"
-    ///
+    /**
+     * Copy the contents of <code>other</code> into this vector
+     * @param other copied from vector
+     * */
     vector& operator=(const vector& other)
     {
         if (this != &other)
         {
-            // clean up previous block
             for (size_type index{}; index < m_count; ++index)
-                this->m_array[index].~T();
+                this->m_array[index].~value_type();
             ::operator delete(this->m_array);
 
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * other.m_count, std::nothrow));

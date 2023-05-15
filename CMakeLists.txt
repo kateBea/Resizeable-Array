@@ -7,8 +7,10 @@ include_directories(include/)
 
 if (MSVC)
     # Compile commands for Windows
+    message("Using compilation flags for non MSVC")
 else()
     # Compile commands for Linux
+    message("Using compilation flags for non MSVC compilers")
     add_compile_options(-Wall -Wpedantic -Wextra -fsanitize=address)
     add_link_options(-fsanitize=address)
 endif()
@@ -16,3 +18,5 @@ endif()
 
 add_executable(ctorTest1 src/test_constructors1.cc)
 add_executable(ctorTest2 src/test_constructors2.cc)
+
+add_executable(assignmentOp src/copy_assigment.cc)
