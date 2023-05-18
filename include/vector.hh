@@ -648,7 +648,7 @@ private:
     auto reallocate() -> void
     {
         // we reserve space for one element if the vector is empty when reallocate() is called
-        size_type new_block_count{ (this->m_capacity == nullptr) ? 1 : (this->m_capacity * GROW_FACTOR) };
+        size_type new_block_count{ (this->m_capacity == 0) ? 1 : (this->m_capacity * GROW_FACTOR) };
         pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_count, std::nothrow)) };
 
         if (new_block == nullptr)

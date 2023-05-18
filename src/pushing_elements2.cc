@@ -6,7 +6,7 @@
 class Resource {
 public:
     explicit Resource(int id = 0) : identifier_{ id } { std::cerr << "Constructing: " << identifier_ << '\n'; }
-    Resource(Resource&& other) : identifier_{ other.identifier_ } { other.identifier_ = -1; std::cerr << "Moving: " << identifier_ << '\n';; }
+    Resource(Resource&& other) : identifier_{ other.identifier_ } { other.identifier_ = -1; std::cerr << "Moving: " << identifier_ << '\n'; }
     void show_value() const { std::cerr << identifier_ << '\n'; }
     ~Resource() { std::cerr << "Resource destruction... identifier: " << identifier_ << '\n'; }
 private:

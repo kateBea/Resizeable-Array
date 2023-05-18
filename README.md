@@ -17,34 +17,36 @@ An exmaple of a resizeable array is the **vector** class from the standard libra
 (**std::vector<T>**) which this implementation is partially inspered on. This implementation
 is aimed to support any type that is both copy assigneable and copy constructible.
 
-Below an example of usage:
+Below an example of usage in file [demo](src/demo.cc):
 
 ```cpp
 #include <iostream>
 #include <vector.hh>
 
 int main(int, char**) {
-    kt::vector<int> my_vector;
-    
-    my_vector.push_back(10);
-    my_vector.push_back(20);
-    my_vector.push_back(30);
-    my_vector.push_back(40);
+    kt::vector<int> ints{};
 
-    std::cout << "First element: " << my_vector[0] << std::endl;
-    std::cout << "Second element: " << my_vector[1] << std::endl;
+    ints.push_back(10);
+    ints.push_back(20);
+    ints.push_back(30);
+    ints.push_back(40);
+
+    std::cout << "First element: " << ints.front() << std::endl;
+    std::cout << "Last element:  " << ints.back() << std::endl;
 
     std::cout << "Vector contents: ";
-    for (int i = 0; i < my_vector.size(); i++) {
-        std::cout << my_vector[i] << " ";
-    }
-    
-    std::cout << std::endl;
-    my_vector.pop_back();
-    std::cout << "Vector size: " << my_vector.size() << std::endl;
 
-    my_vector.clear();
-    std::cout << "Vector size after clearing: " << my_vector.size() << std::endl;
+    for (const auto& item : ints)
+        std::cout << item << ' ';
+    std::cout << "Vector size: " << ints.size() << std::endl;
+
+    std::cout << "\nCalling pop_back()..." << std::endl;
+
+    ints.pop_back();
+    std::cout << "Vector size: " << ints.size() << std::endl;
+
+    ints.clear();
+    std::cout << "Vector size after clearing: " << ints.size() << std::endl;
 
     return 0;
 }
@@ -52,7 +54,7 @@ int main(int, char**) {
 ```shell
 # Building and executing the example
 # Clone repository
-git clone --recursive repo_url
+git clone repo_url
 cd Resizeable-Array
 
 # Build application
@@ -62,5 +64,5 @@ cmake ..
 cmake --build .
 
 # Run application
-./ctorTest1
+./demo
 ```

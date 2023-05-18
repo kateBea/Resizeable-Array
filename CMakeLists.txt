@@ -25,3 +25,5 @@ add_executable(accessors1 src/accessors1.cc)
 
 add_executable(pushingElems1 src/pushing_elements1.cc)
 add_executable(pushingElems2 src/pushing_elements2.cc)
+
+add_executable(demo src/demo.cc)
