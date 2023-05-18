@@ -16,7 +16,6 @@ public:
     using reference_type        = T&;
     using pointer_type          = T*;
     using const_reference_type  = const T&;
-    using c_string_type         = const char*;
     using iterator_type         = iterator<T>;
     using const_iterator_type   = const_iterator<T>;
 
@@ -48,7 +47,7 @@ public:
         }
         if (not this->m_array)
         {
-#ifdef _DEBUG
+#if defined(_DEBUG)
             std::printf("could not allocate block of memory...");
 #endif
             this->m_capacity = 0;
@@ -66,7 +65,7 @@ public:
     {
         if (this->m_array)
             std::uninitialized_copy(content.begin(), content.end(), this->m_array);
-#ifdef _DEBUG
+#if defined(_DEBUG)
         else
         {
             std::printf("could not allocate block of memory...");
@@ -102,7 +101,7 @@ public:
                 this->m_count = new_block_size / sizeof(value_type);
                 this->m_capacity = new_block_size / sizeof(value_type);
             }
-#ifdef _DEBUG
+#if defined(_DEBUG)
             else
             {
                 std::printf("could not allocate block of memory...");
@@ -110,11 +109,6 @@ public:
 #endif
         }
     }
-
-    ///
-    /// Parametrized constructor. Initialize this vector with "count"
-    /// elements starting from "begin"
-    ///
 
     /**
      * Initialize this vector with <code>count</code> elements from
@@ -140,7 +134,7 @@ public:
                 this->m_count = count;
                 this->m_capacity = count;
             }
-#ifdef _DEBUG
+#if defined(_DEBUG)
             else
             {
 
@@ -167,7 +161,7 @@ public:
                 this->m_count = other.size();
                 this->m_capacity = other.capacity();
             }
-#ifdef _DEBUG
+#if defined(_DEBUG)
             else
             {
                 std::printf("could not allocate block of memory...");
@@ -304,14 +298,10 @@ public:
     auto operator[](size_type index) -> reference_type
     {
 #ifdef _DEBUG
-        assert(index < this->m_count && "Attempting to derefenrence out of bounds index element...");
+        assert(index >= size() && "Attempting to access out of bounds element...");
 #endif
-        return (*this)[index];
+        return this->m_array[index];
     }
-
-    ///
-    /// Returns constant reference to element at postion "index"
-    ///
 
     /**
      * Returns a constant reference to the element at index <code>index</code>
@@ -321,16 +311,10 @@ public:
     auto operator[](size_type index) const -> const_reference_type
     {
 #ifdef _DEBUG
-        assert(index < this->m_count && "Attempting to derefenrence out of bounds index element...");
+        assert(index >= size() && "Attempting to access out of bounds element...");
 #endif
-        return (*this)[index];
+        return this->m_array[index];
     }
-
-    ///
-    /// Return reference to element at postion "index" throws "out_of_bounds"
-    /// exception if index is not within the range of valid elements
-    /// or "empty_vector" if the vector has no elements
-    ///
 
     /**
      * Return reference to element at position <code>index</code>
@@ -409,23 +393,27 @@ public:
         new(&this->m_array[this->m_count++]) value_type(std::forward<Args>(args)...);
     }
 
-    ///
-    /// Concatenate the contents of this vector and "other"
-    /// This vector contains the result of the concatenation
-    ///
+    /**
+     * Concatenates the contents of this vector and <code>other</code>, i.e. inserts
+     * all the elements of <code>other</code> at the end of this vector
+     * @param other has the contents to be appended to this vector
+     * */
     auto append(const vector& other) -> void
     {
         if (!other.empty())
         {
             pointer_type new_block{ static_cast<pointer_type>
-                (::operator new(sizeof(value_type) * (this->m_count + other.m_count), std::nothrow)) };
+                (::operator new(sizeof(value_type) * (size() + other.size()), std::nothrow)) };
 
-            if (new_block)
+            if (new_block != nullptr)
             {
-                std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),
-                    this->m_count * sizeof(value_type));
-                std::memcpy(static_cast<void*>(new_block + this->m_count), static_cast<const void*>(other.m_array),
-                    other.m_count * sizeof(value_type));
+                // Move this vector's memory block data to the newly allocated block
+                std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),size() * sizeof(value_type));
+
+                // Copy contents of other at the end of this vector
+                auto it{ new_block + size() };
+                for (const auto& item : other)
+                    new (it++) value_type(item);
 
                 ::operator delete(static_cast<void*>(this->m_array));
 
@@ -436,53 +424,45 @@ public:
             }
             else
             {
+#if defined(_DEBUG)
                 std::printf("failed to concatenate. Could not allocate block of memory...");
+#endif
                 return;
             }
         }
     }
 
-    ///
-    /// Destroy the last n elements. If there is less than
-    /// count elements, it empties the vector
-    ///
+    /**
+     * Destroy the last <code>count</code> elements from
+     * this vector. If there's  less than <code>count</code> elements,
+     * the effects of this function are the same as <code>clear()</code>
+     * */
     auto remove_n(size_type count) -> void
     {
-        if (count < this->m_count)
+        if (count < size())
         {
             // if we have more than count elements
-            std::for_each(this->m_array,
-                this->m_array + count, [](reference_type info) -> void { info.~T(); });
+            std::for_each(begin(),
+                          end(),
+                          [](reference_type info) -> void { info.~value_type(); });
 
-            this->m_count -= count;
+            this->m_count = size() - count;
         }
         else
         {
-            // if we have less than count elements
-            std::for_each(this->m_array,
-                this->m_array + this->m_count, [](reference_type info) -> void { info.~T(); });
-
-            this->m_count = 0;
+            clear();
         }
     }
 
-    ///
-    /// Insert one element at the end of the vector
-    ///
-    auto push_back(const_reference_type info) -> void
+    /**
+     * Insert <code>elem</code> at the end of this vector
+     * @param elem new element to be inserted
+     * */
+    auto push_back(const_reference_type elem) -> void
     {
-        // if capacity == count:
-        // allocate new block
-        // copy data from old block to new block
-        // add new data
-        // delete old block
-
-        // otherwise (capacity > count)
-        // put new element at the end
-        // increase count by 1
-        if (this->m_capacity > this->m_count)
+        if (capacity() > size())
         {
-            new(&this->m_array[this->m_count]) value_type(info);
+            new(&this->m_array[this->m_count]) value_type(elem);
             this->m_count += 1;
         }
         else
@@ -491,50 +471,46 @@ public:
 
             // if reallocate fails, m_count will remain same as m_capacity
             // preventing from appending new element
-            if (this->m_capacity == this->m_count)
+            if (capacity() == size())
             {
+#if defined(_DEBUG)
                 std::printf("could not insert new element due to error while reallocating...");
+#endif
                 return;
             }
 
-            new(&this->m_array[this->m_count]) value_type(info);
+            new(&this->m_array[this->m_count]) value_type(elem);
             this->m_count += 1;
         }
     }
 
-    ///
-    /// Insert one element at the end of the vector
-    /// with support for move semantics
-    ///
-    auto push_back(value_type&& info) -> void
+    /**
+     * Insert <code>elem</code> at the end of this vector
+     * using move semantics
+     * @param elem new element
+     * */
+    auto push_back(value_type&& elem) -> void
     {
-        // if capacity == count:
-        // allocate new block
-        // copy data from old block to new block
-        // add new data
-        // delete old block
-
-        // otherwise (capacity > count)
-        // put new element at the end
-        // increase count by 1
-        if (this->m_capacity > this->m_count)
+        if (capacity() > size())
         {
-            new(&this->m_array[this->m_count]) value_type(std::move(info));
+            new(&this->m_array[this->m_count]) value_type(std::move(elem));
             this->m_count += 1;
         }
         else
         {
             reallocate();
 
-            // if reallocate fails, m_count will remain same as m_capacity
+            // if reallocate fails, size() will be same as capacity()
             // preventing from appending new element
-            if (this->m_capacity == this->m_count)
+            if (capacity() == size())
             {
+#if defined(_DEBUG)
                 std::printf("could not insert new element due to error while reallocating...");
+#endif
                 return;
             }
 
-            new(&this->m_array[this->m_count]) value_type(std::move(info));
+            new(&this->m_array[this->m_count]) value_type(std::move(elem));
             ++(this->m_count);
         }
     }
@@ -546,7 +522,7 @@ public:
     {
         if (this->m_count != 0)
         {
-            this->m_array[this->m_count - 1].~T();
+            (*this)[size() - 1].~value_type();
             --(this->m_count);
         }
 
@@ -557,7 +533,9 @@ public:
      * */
     auto clear() -> void
     {
-        std::for_each(this->m_array, this->m_array + this->m_count, [](T& info) -> void { info.~T(); });
+        std::for_each(begin(),
+                      end(),
+                      [](reference_type info) -> void { info.~value_type(); });
         this->m_count = 0;
     }
 
@@ -631,45 +609,57 @@ public:
         return *this->m_array;
     }
 
-    ///
-    /// Returns a reference to the last element of the vector
-    ///
+    /**
+     * Returns a reference to the last element of this vector
+     * @return last element
+     * */
     auto back() noexcept -> reference_type 
     {
+#if defined(_DEBUG)
+        assert(empty() && "Attempting to retrieve back element of empty vector");
+#endif
         return *(this->m_array + this->m_count - 1);
     }
 
-    ///
-    /// Returns a reference to the first element of the vector
-    ///
+    /**
+     * Returns a constant reference to the first element of this vector
+     * @return front element
+     * */
     auto front() const noexcept -> const_reference_type 
     {
         return *this->m_array;
     }
 
-    ///
-    /// Returns a reference to the last element of the vector
-    ///
+    /**
+     * Returns a constant reference to the last element of this vector
+     * @return last element
+     * */
     auto back() const noexcept -> const_reference_type 
     {
-        return *(this->m_array + this->m_count - 1);
+#if  defined(_DEBUG)
+        assert(empty() && "Attempting to retrieve back element of empty vector");
+#endif
+        return *(data() + size() - 1);
     }
 
 private:
-    static constexpr size_type grow_factor{ 2 };
+    static constexpr size_type GROW_FACTOR{ 2 };
 
-    void reallocate()
+    auto reallocate() -> void
     {
-        size_type new_block_count{ (!this->m_capacity) ? 1 : (this->m_capacity * grow_factor) };
+        // we reserve space for one element if the vector is empty when reallocate() is called
+        size_type new_block_count{ (this->m_capacity == nullptr) ? 1 : (this->m_capacity * GROW_FACTOR) };
         pointer_type new_block{ static_cast<pointer_type>(::operator new(sizeof(T) * new_block_count, std::nothrow)) };
 
-        if (not new_block)
+        if (new_block == nullptr)
         {
+#ifdef _DEBUG
             std::printf("Failed to allocate new block of memory");
+#endif
             return;
         }
 
-        // TODO: pending to change to std::copy, same goes for some constructors
+        // we just want to move the contents of one block of memory to another
         std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),
             this->m_count * sizeof(value_type));
 
@@ -677,7 +667,6 @@ private:
 
         this->m_array = new_block;
         this->m_capacity = new_block_count;
-
     }
     
     pointer_type    m_array;
@@ -694,7 +683,9 @@ private:
      * <p><code>m_capacity</code> is increased by a growth factor to minimise the number of call to reallocate()</br></p>
      * <p><code>m_count</code> keeps track of the amount of valid elements in this vector inside the vector</br></p>
      * */
-};
+
+
+};  // CLASS VECTOR
 
 NAMESPACE_KT_END   // END KT NAMESPACE
 

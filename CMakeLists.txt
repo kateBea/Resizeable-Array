@@ -20,3 +20,8 @@ add_executable(ctorTest1 src/test_constructors1.cc)
 add_executable(ctorTest2 src/test_constructors2.cc)
 
 add_executable(assignmentOp src/copy_assigment.cc)
+
+add_executable(accessors1 src/accessors1.cc)
+
+add_executable(pushingElems1 src/pushing_elements1.cc)
+add_executable(pushingElems2 src/pushing_elements2.cc)
