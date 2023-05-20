@@ -206,9 +206,9 @@ public:
      * @param other moved from vector
      * */
     vector(vector&& other) noexcept
-        :   m_array{ other.m_array }, m_count{ other.size() }, m_capacity{ other.capacity() }
+        :   m_array{ other.m_array }, m_count{ other.m_count }, m_capacity{ other.m_capacity }
     {
-        if (other.capacity != 0)
+        if (other.m_capacity != 0)
         {
             other.m_array = nullptr;
             other.m_count = 0;
@@ -298,7 +298,7 @@ public:
     auto operator[](size_type index) -> reference_type
     {
 #ifdef _DEBUG
-        assert(index >= size() && "Attempting to access out of bounds element...");
+        assert(index < size() && "Attempting to access out of bounds element...");
 #endif
         return this->m_array[index];
     }
@@ -311,7 +311,7 @@ public:
     auto operator[](size_type index) const -> const_reference_type
     {
 #ifdef _DEBUG
-        assert(index >= size() && "Attempting to access out of bounds element...");
+        assert(index < size() && "Attempting to access out of bounds element...");
 #endif
         return this->m_array[index];
     }
@@ -419,7 +419,7 @@ public:
 
                 this->m_array = new_block;
                 this->m_count = this->m_count + other.m_count;
-                this->m_capacity = this->m_count + other.m_count;
+                this->m_capacity = this->m_count;
 
             }
             else
@@ -616,7 +616,7 @@ public:
     auto back() noexcept -> reference_type 
     {
 #if defined(_DEBUG)
-        assert(empty() && "Attempting to retrieve back element of empty vector");
+        assert(!empty() && "Attempting to retrieve back element of empty vector");
 #endif
         return *(this->m_array + this->m_count - 1);
     }
@@ -637,7 +637,7 @@ public:
     auto back() const noexcept -> const_reference_type 
     {
 #if  defined(_DEBUG)
-        assert(empty() && "Attempting to retrieve back element of empty vector");
+        assert(!empty() && "Attempting to retrieve back element of empty vector");
 #endif
         return *(data() + size() - 1);
     }

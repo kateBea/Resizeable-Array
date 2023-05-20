@@ -1,4 +1,4 @@
-#include "../include/vector.hh"
+#include <vector.hh>
 #include <iostream>
 #include <memory>
 
@@ -229,9 +229,6 @@ int main(int, char**)
 
     std::cout << "stuff size(): " << stuff.size() << std::endl;
     std::cout << "stuff capacity(): " << stuff.capacity() << std::endl;
-
-
-
 
     std::cout << "\nFinishing program..." << std::endl;
     std::cout << std::endl;
