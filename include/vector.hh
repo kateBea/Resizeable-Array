@@ -186,9 +186,7 @@ public:
 
             if (this->m_array)
             {
-                std::memcpy(static_cast<void*>(this->m_array), static_cast<const void*>(other.m_array),
-                    other.m_count * sizeof(value_type));
-                // std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
+                std::copy(other.m_array, other.m_array + other.m_count, this->m_array);
                 this->m_count = other.m_count;
                 this->m_capacity = other.m_capacity;
             }
