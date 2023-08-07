@@ -27,7 +27,5 @@ add_executable(pushingElems1 src/pushing_elements1.cc)
 add_executable(pushingElems2 src/pushing_elements2.cc)
 
 add_executable(demo src/demo.cc)
-# MSVC already defines _DEBUG on Debug builds
-target_compile_definitions(demo PRIVATE _DEBUG)
 
 add_executable(testVector src/main.cc)

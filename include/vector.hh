@@ -47,7 +47,7 @@ public:
         }
         if (not this->m_array)
         {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
             std::printf("could not allocate block of memory...");
 #endif
             this->m_capacity = 0;
@@ -65,7 +65,7 @@ public:
     {
         if (this->m_array)
             std::uninitialized_copy(content.begin(), content.end(), this->m_array);
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
         else
         {
             std::printf("could not allocate block of memory...");
@@ -85,7 +85,7 @@ public:
     vector(InputIterator first, InputIterator last)
         :   m_array{ nullptr }, m_count{}, m_capacity{}
     {
-        // represents the amount of bytes between first and last
+        // represents the number of bytes between first and last
         size_type new_block_size{ sizeof(value_type) * (last - first) };
 
         if (new_block_size != 0)
@@ -101,7 +101,7 @@ public:
                 this->m_count = new_block_size / sizeof(value_type);
                 this->m_capacity = new_block_size / sizeof(value_type);
             }
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
             else
             {
                 std::printf("could not allocate block of memory...");
@@ -134,7 +134,7 @@ public:
                 this->m_count = count;
                 this->m_capacity = count;
             }
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
             else
             {
 
@@ -161,7 +161,7 @@ public:
                 this->m_count = other.size();
                 this->m_capacity = other.capacity();
             }
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
             else
             {
                 std::printf("could not allocate block of memory...");
@@ -295,7 +295,7 @@ public:
     [[nodiscard]]
     auto operator[](size_type index) -> reference_type
     {
-#ifdef _DEBUG
+#if defined(NDEBUG)
         assert(index < size() && "Attempting to access out of bounds element...");
 #endif
         return this->m_array[index];
@@ -308,7 +308,7 @@ public:
      * */
     auto operator[](size_type index) const -> const_reference_type
     {
-#ifdef _DEBUG
+#if !defined(NDEBUG)
         assert(index < size() && "Attempting to access out of bounds element...");
 #endif
         return this->m_array[index];
@@ -422,10 +422,9 @@ public:
             }
             else
             {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
                 std::printf("failed to concatenate. Could not allocate block of memory...");
 #endif
-                return;
             }
         }
     }
@@ -471,7 +470,7 @@ public:
             // preventing from appending new element
             if (capacity() == size())
             {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
                 std::printf("could not insert new element due to error while reallocating...");
 #endif
                 return;
@@ -502,7 +501,7 @@ public:
             // preventing from appending new element
             if (capacity() == size())
             {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
                 std::printf("could not insert new element due to error while reallocating...");
 #endif
                 return;
@@ -613,7 +612,7 @@ public:
      * */
     auto back() noexcept -> reference_type 
     {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
         assert(!empty() && "Attempting to retrieve back element of empty vector");
 #endif
         return *(this->m_array + this->m_count - 1);
@@ -634,7 +633,7 @@ public:
      * */
     auto back() const noexcept -> const_reference_type 
     {
-#if  defined(_DEBUG)
+#if !defined(NDEBUG)
         assert(!empty() && "Attempting to retrieve back element of empty vector");
 #endif
         return *(data() + size() - 1);
@@ -651,7 +650,7 @@ private:
 
         if (new_block == nullptr)
         {
-#ifdef _DEBUG
+#if !defined(NDEBUG)
             std::printf("Failed to allocate new block of memory");
 #endif
             return;
