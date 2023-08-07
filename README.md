@@ -10,12 +10,12 @@ flexibility in the size of the array, makes it easier to deal with task that req
 extra space during runtime.
 
 This encapsulation is implemented using a pointer that owns a block of data with two integral 
-values that keep track of how big is the chuc¡nk of memory held by the pointer and how
+values that keep track of how big is the chucnk of memory held by the pointer and how
 many valid elements there are.
 
 An exmaple of a resizeable array is the **vector** class from the standard library in C++
 (**std::vector<T>**) which this implementation is partially inspered on. This implementation
-is aimed to support any type that is both copy assigneable and copy constructible.
+is aimed to support any type that is both copy assignable and copy constructible.
 
 Below an example of usage in file [demo](src/demo.cc):
 
