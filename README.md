@@ -53,6 +53,7 @@ int main(int, char**) {
 ```
 
 # Building and running
+Steps to build and run the examples. Just clone the repo and build the project with CMake, it comes with a couple of examples.
 ```shell
 # Building and executing the example
 # Clone repository
