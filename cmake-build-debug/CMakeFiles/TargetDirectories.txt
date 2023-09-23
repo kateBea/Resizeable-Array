@@ -1,0 +1,10 @@
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/ctorTest1.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/ctorTest2.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/assignmentOp.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/accessors1.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/pushingElems1.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/pushingElems2.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/demo.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/testVector.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/kate/Documents/dev/Resizeable-Array/cmake-build-debug/CMakeFiles/rebuild_cache.dir

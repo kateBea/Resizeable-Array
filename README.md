@@ -1,21 +1,21 @@
 # Simple vector class
-Attempt of implementation of a class to encapsulate dynamically resizeable arrays.
+Implementation attempt of a class that encapsulates a dynamically resizeable array.
 
 A dynamic resizable array is an array-like data structure that can change its size 
-dynamically at runtime. It starts with a certain initial capacity and grows or 
-shrinks as needed, based on the number of elements may hold.
+dynamically i.e., at runtime. It starts with a certain initial capacity and grows or 
+shrinks as needed, based on the number of elements it may hold.
 
 The advantage of a dynamic array over a static array is that it allows for more 
-flexibility in the size of the array, makes it easier to deal with task that require 
+flexibility in the size of the array, especially when it is unknown at compile time, also makes it easier to deal with tasks that require 
 extra space during runtime.
 
 This encapsulation is implemented using a pointer that owns a block of data with two integral 
-values that keep track of how big is the chucnk of memory held by the pointer and how
-many valid elements there are.
+values: one that keep track of how big is the block of memory held by the pointer and another that tells how
+many valid elements are in that block.
 
 An exmaple of a resizeable array is the **vector** class from the standard library in C++
-(**std::vector<T>**) which this implementation is partially inspered on. This implementation
-is aimed to support any type that is both copy assignable and copy constructible.
+(**std::vector<T>**) which this implementation is partially inspired on. This implementation
+is aimed to support any type that is both copy-assignable and copy constructible.
 
 Below an example of usage in file [demo](src/demo.cc):
 

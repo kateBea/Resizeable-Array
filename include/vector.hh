@@ -21,11 +21,11 @@ public:
 
     /**
      * Default constructs this vector with initial size of 0
-     * and initial capacity of 0
+     * and initial capacity of 0.
      * */
     explicit
     vector() noexcept
-        :   m_array{ nullptr }, m_count{}, m_capacity{}
+        :   m_array{ nullptr }, m_count{ 0 }, m_capacity{ 0 }
     {}
 
     /**
@@ -41,7 +41,7 @@ public:
         if (m_count != 0) {
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * count, std::nothrow));
 
-            // if we managed to allocate space we fill the array with the provided value
+            // if we managed to allocate space, we fill the array with the provided value
             if (this->m_array != nullptr)
                 std::uninitialized_fill(this->m_array, this->m_array + m_count, value);
         }
@@ -56,7 +56,7 @@ public:
 
     /**
      * Constructs and initializes this vector with the elements with in the
-     * range of the <b>std::initializer_list</b>
+     * range of the <b>std::initializer_list</b>.
      * @param content range of elements to initialize this vector with
      * */
     vector(std::initializer_list<value_type>&& content)
@@ -76,7 +76,7 @@ public:
     /**
      * Initialize this vector with the elements from the range within
      * first and last (exclusive) iterators, i.e. copies [first, last)
-     * to this vector
+     * to this vector.
      * @param first first elements from the range of elements to be copied
      * @param last last element from the range (not copied)
      * @tparam InputIterator iterator that allows to read the referenced content
@@ -113,7 +113,7 @@ public:
     /**
      * Initialize this vector with <code>count</code> elements from
      * range of elements starting at <code>first</code>. If the range contains
-     * less than <code>count</code> elements the behaviour of this method is undefined
+     * less than <code>count</code> elements the behaviour of this method is undefined.
      * @param first starting point of the range of elements
      * @param count amount of elements to be copied
      * @tparam InputIterator iterator that allows to read the referenced content
@@ -145,7 +145,7 @@ public:
     }
 
     /**
-     * Copies contents from <code>other</code> into this vector
+     * Copies contents from <code>other</code> into this vector.
      * @param other copied from vector
      * */
     vector(const vector& other)
@@ -171,17 +171,18 @@ public:
     }
 
     /**
-     * Copy the contents of <code>other</code> into this vector
+     * Copy the contents of <code>other</code> into this vector.
      * @param other copied from vector
+     * @returns <code>*this</code>
      * */
-    vector& operator=(const vector& other)
+    auto operator=(const vector& other) -> vector&
     {
         if (this != &other)
         {
             for (size_type index{}; index < m_count; ++index)
                 this->m_array[index].~value_type();
-            ::operator delete(this->m_array);
 
+            ::operator delete(this->m_array);
             this->m_array = static_cast<pointer_type>(::operator new(sizeof(value_type) * other.m_count, std::nothrow));
 
             if (this->m_array)
@@ -190,17 +191,20 @@ public:
                 this->m_count = other.m_count;
                 this->m_capacity = other.m_capacity;
             }
+#if !defined(NDEBUG)
             else
+            {
                 std::printf("could not allocate block of memory...");
+            }
+#endif
         }
 
         return *this;
     }
 
     /**
-     * Moves the contents of the <code>other</code> vector
-     * into this vector. After this operation <code>other</code> is put
-     * into an invalid state
+     * Moves the contents of the <code>other</code> vector into this vector.
+     * After this operation <code>other</code> is put into an invalid state.
      * @param other moved from vector
      * */
     vector(vector&& other) noexcept
@@ -215,12 +219,12 @@ public:
     }
 
     /**
-     * Moves the contents of the <code>other</code> vector
-     * into this vector. After this operation <code>other</code> is put
-     * into an invalid state
+     * Moves the contents of the <code>other</code> vector into this vector.
+     * After this operation <code>other</code> is put into an invalid state.
      * @param other moved from vector
+     * @returns <code>*this</code>
      * */
-    vector& operator=(vector&& other) noexcept
+    auto operator=(vector&& other) noexcept -> vector&
     {
         if (this != &other)
         {
@@ -238,7 +242,7 @@ public:
 
     /**
      * Returns a pointer to the block holding the underlying buffer of data
-     * @return pointer to the elements
+     * @returns pointer to the underlying block of data
      * */
     constexpr auto data() -> pointer_type
     {
@@ -246,7 +250,7 @@ public:
     }
 
     /**
-     * Calls the destructor for all the contained elements
+     * Calls the destructor for all the elements
      * in this vector and frees the underlying buffer of memory
      * */
     ~vector()
@@ -259,8 +263,8 @@ public:
     }
 
     /**
-     * Returns the total count of elements of this vector
-     * @return total elements contained within this vector
+     * Returns the count of elements in this vector
+     * @returns amount of elements contained within this vector
      * */
      [[nodiscard]]
     auto size() const -> size_type
@@ -269,8 +273,8 @@ public:
     }
 
     /**
-     * Returns the number of elements this vector has allocated space for
-     * @return capacity of this vector
+     * Returns the number of elements this vector has allocated space for.
+     * @returns capacity of this vector
      * */
     [[nodiscard]]
     auto capacity() const -> size_type
@@ -279,8 +283,8 @@ public:
     }
 
     /**
-     * Returns <code>true</code> if this vector has no elements,
-     * returns <code>false</code> otherwise
+     * Returns <code>true</code> if this vector has no elements, <code>false</code> otherwise.
+     * @returns if this vector is empty or not
      * */
     [[nodiscard]]
     auto empty() const -> bool
@@ -289,8 +293,9 @@ public:
     }
 
     /**
-     * Returns a reference to the first element of this vector
-     * @return reference to first element
+     * Returns a reference to the first element of this vector.
+     * @param index index of the element to be returned
+     * @returns reference to the element at the specified index
      * */
     [[nodiscard]]
     auto operator[](size_type index) -> reference_type
@@ -302,9 +307,9 @@ public:
     }
 
     /**
-     * Returns a constant reference to the element at index <code>index</code>
+     * Returns a constant reference to the element at index <code>index</code>.
      * @param index index of the element to be returned
-     * @return reference to the element at the given index
+     * @returns reference to the element at the given index
      * */
     auto operator[](size_type index) const -> const_reference_type
     {
@@ -315,9 +320,9 @@ public:
     }
 
     /**
-     * Return reference to element at position <code>index</code>
+     * Return reference to element at position <code>index</code>.
      * @param index index of the element to be returned
-     * @return reference to the element at the given index
+     * @returns reference to the element at the given index
      * @throws std::runtime_error if this vector is empty or the index is out of bounds
      * */
     auto at(size_type index) -> reference_type
@@ -332,9 +337,9 @@ public:
     }
 
     /**
-     * Return constant reference to element at position <code>index</code>
+     * Return constant reference to element at position <code>index</code>.
      * @param index index of the element to be returned
-     * @return constant reference to the element at the given index
+     * @returns constant reference to the element at the given index
      * @throws std::runtime_error if this vector is empty or the index is out of bounds
      * */
     auto at(size_type index) const -> const_reference_type
@@ -348,18 +353,16 @@ public:
         return (*this)[index];
     }
 
-    ///
-    /// Reserve a block of memory to hold at least count elements
-    /// Has no effect if the container can already hold new_count elements i.e.
-    /// this->capacity() is equal or greater to new_count
-    ///
+    /**
+     * Reserve a block of memory to hold at least count elements. Has no
+     * effect if the container can already hold <code>new_count</code>extra  elements.
+     * <code>new_count</code> just tells how many elements we want in this vector besides
+     * the ones currently stored.
+     * @param new_count how many extra elements we may want in this vector
+     * */
     auto reserve(size_type new_count) -> void
     {
-        // TODO: how should this function behave when theres elements
-        // TODO: how should this function behave when theres no elements
-
-        // TODO: how should this function behave when capacity is 0
-        // TODO: how should this function behave when capacity is is not 0
+        // TODO: not fully implemented yet
         if (new_count > capacity())
         {
             this->m_capacity = new_count;
@@ -367,10 +370,15 @@ public:
         }
     }
 
-    ///
-    /// Adjust vector to contain count elements
-    ///
-    auto resize(size_type count) -> void
+    /**
+     * After this operation, this vector may have <code>count</code> elements.
+     * If count is greater than <code>size()</code> the necessary amount of elements
+     * are appended to this vector to have count elements, these are default initialized,
+     * otherwise the user can specify the object the additional elements must be copied from.
+     * If count is smaller than <code>size()</code> the required amount of elements are
+     * deleted from this vector.
+     * */
+    auto resize(size_type count, const value_type& info = value_type()) -> void
     {
 
     }
@@ -378,7 +386,7 @@ public:
     /**
      * Construct element in place, in this case, right
      * at the end of this vector. This function takes the necessary
-     * arguments to construct a new object of the type held by this vector
+     * arguments to construct a new object of the type held by this vector.
      * @param args arguments to construct the new object
      * @tparam types of the parameters of this function
      * */
@@ -393,8 +401,8 @@ public:
 
     /**
      * Concatenates the contents of this vector and <code>other</code>, i.e. inserts
-     * all the elements of <code>other</code> at the end of this vector
-     * @param other has the contents to be appended to this vector
+     * all the elements of <code>other</code> at the end of this vector.
+     * @param other has the contents to be appended at the end of this vector
      * */
     auto append(const vector& other) -> void
     {
@@ -408,7 +416,7 @@ public:
                 // Move this vector's memory block data to the newly allocated block
                 std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),size() * sizeof(value_type));
 
-                // Copy contents of other at the end of this vector
+                // Copy the contents of other at the end of this vector
                 auto it{ new_block + size() };
                 for (const auto& item : other)
                     new (it++) value_type(item);
@@ -432,7 +440,8 @@ public:
     /**
      * Destroy the last <code>count</code> elements from
      * this vector. If there's  less than <code>count</code> elements,
-     * the effects of this function are the same as <code>clear()</code>
+     * the effects of this function are the same as <code>clear()</code>.
+     * @param count number of elements to be deleted
      * */
     auto remove_n(size_type count) -> void
     {
@@ -452,7 +461,7 @@ public:
     }
 
     /**
-     * Insert <code>elem</code> at the end of this vector
+     * Insert <code>elem</code> at the end of this vector.
      * @param elem new element to be inserted
      * */
     auto push_back(const_reference_type elem) -> void
@@ -466,9 +475,9 @@ public:
         {
             reallocate();
 
-            // if reallocate fails, m_count will remain same as m_capacity
-            // preventing from appending new element
-            if (capacity() == size())
+            // if reallocate fails, m_count will remain the same as m_capacity
+            // preventing from appending elements any further
+            if (this->m_capacity == this->m_count)
             {
 #if !defined(NDEBUG)
                 std::printf("could not insert new element due to error while reallocating...");
@@ -483,7 +492,7 @@ public:
 
     /**
      * Insert <code>elem</code> at the end of this vector
-     * using move semantics
+     * using move semantics.
      * @param elem new element
      * */
     auto push_back(value_type&& elem) -> void
@@ -498,8 +507,8 @@ public:
             reallocate();
 
             // if reallocate fails, size() will be same as capacity()
-            // preventing from appending new element
-            if (capacity() == size())
+            // preventing from appending elements any further
+            if (this->m_capacity == this->m_count)
             {
 #if !defined(NDEBUG)
                 std::printf("could not insert new element due to error while reallocating...");
@@ -513,7 +522,7 @@ public:
     }
 
     /**
-     * Remove the last element of this vector
+     * Remove the last element of this vector. If this vector is empty this operation has no effect.
      * */
     auto pop_back() -> void
     {
@@ -522,7 +531,6 @@ public:
             (*this)[size() - 1].~value_type();
             --(this->m_count);
         }
-
     }
 
     /**
@@ -537,8 +545,8 @@ public:
     }
 
     /**
-     * Returns an iterator to the beginning of the vector
-     * @return access to the elements at the beginning
+     * Returns an iterator to the beginning of the vector.
+     * @returns access to the elements at the beginning
      * */
      [[nodiscard]]
     constexpr auto begin() noexcept -> iterator_type
@@ -547,8 +555,8 @@ public:
     }
 
     /**
-     * Returns an iterator past the last element of the vector
-     * @return access to the element past the end of this vector
+     * Returns an iterator past the last element of the vector.
+     * @returns access to the element past the end of this vector
      * */
     [[nodiscard]]
     constexpr auto end() noexcept -> iterator_type
@@ -557,8 +565,8 @@ public:
     }
 
     /**
-     * Returns a constant iterator to the beginning of the vector
-     * @return read-only access to the elements at the beginning
+     * Returns a constant iterator to the beginning of the vector.
+     * @returns read-only access to the elements at the beginning
      * */
     [[nodiscard]]
     constexpr auto begin() const noexcept -> const_iterator_type
@@ -567,8 +575,8 @@ public:
     }
 
     /**
-     * Returns a constant iterator past the last element of the vector
-     * @return read-only access to the element past the end of this vector
+     * Returns a constant iterator past the last element of the vector.
+     * @returns read-only access to the element past the end of this vector
      * */
     [[nodiscard]]
     constexpr auto end() const noexcept -> const_iterator_type
@@ -577,8 +585,8 @@ public:
     }
 
     /**
-     * Returns a constant iterator to the beginning of the vector
-     * @return read-only access to the elements at the beginning
+     * Returns a constant iterator to the beginning of the vector.
+     * @returns read-only access to the elements at the beginning
      * */
     [[nodiscard]]
     constexpr auto cbegin() const noexcept -> const_iterator_type
@@ -587,8 +595,8 @@ public:
     }
 
     /**
-     * Returns a constant iterator past the last element of the vector
-     * @return read-only access to the element past the end of this vector
+     * Returns a constant iterator past the last element of the vector.
+     * @returns read-only access to the element past the end of this vector
      * */
     [[nodiscard]]
     constexpr auto cend() const noexcept -> const_iterator_type
@@ -597,8 +605,8 @@ public:
     }
 
     /**
-     * Returns a reference to the first element of this vector
-     * @return front element
+     * Returns a reference to the first element of this vector.
+     * @returns front element
      * */
     [[nodiscard]]
     auto front() noexcept -> reference_type
@@ -607,7 +615,7 @@ public:
     }
 
     /**
-     * Returns a reference to the last element of this vector
+     * Returns a reference to the last element of this vector.
      * @return last element
      * */
     auto back() noexcept -> reference_type 
@@ -619,17 +627,20 @@ public:
     }
 
     /**
-     * Returns a constant reference to the first element of this vector
+     * Returns a constant reference to the first element of this vector.
      * @return front element
      * */
     auto front() const noexcept -> const_reference_type 
     {
+#if !defined(NDEBUG)
+        assert(!empty() && "Attempting to retrieve front element of empty vector");
+#endif
         return *this->m_array;
     }
 
     /**
-     * Returns a constant reference to the last element of this vector
-     * @return last element
+     * Returns a constant reference to the last element of this vector.
+     * @returns last element
      * */
     auto back() const noexcept -> const_reference_type 
     {
@@ -656,7 +667,7 @@ private:
             return;
         }
 
-        // we just want to move the contents of one block of memory to another
+        // we just want to move the contents from one block of memory to another
         std::memcpy(static_cast<void*>(new_block), static_cast<const void*>(this->m_array),
             this->m_count * sizeof(value_type));
 
