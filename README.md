@@ -10,7 +10,7 @@ flexibility in the size of the array, especially when it is unknown at compile t
 extra space during runtime.
 
 This encapsulation is implemented using a pointer that owns a block of data with two integral 
-values: one that keep track of how big is the block of memory held by the pointer and another that tells how
+values: one that keeps track of how big is the block of memory held by the pointer and another that tells how
 many valid elements are in that block.
 
 An exmaple of a resizeable array is the **vector** class from the standard library in C++
@@ -51,6 +51,8 @@ int main(int, char**) {
     return 0;
 }
 ```
+
+# Building and running
 ```shell
 # Building and executing the example
 # Clone repository
